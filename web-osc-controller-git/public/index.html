@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web to OSC Multiplayer</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; }
+        .hidden { display: none; }
+        .panel { border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-top: 20px;}
+        input, button { display: block; width: 100%; margin-bottom: 10px; padding: 10px; }
+        button { cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        .osc-btn { background: #28a745; font-weight: bold; }
+        #aggregator-log { background: #f4f4f4; padding: 10px; height: 150px; overflow-y: scroll; border: 1px solid #ddd; font-family: monospace; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h2>Multiplayer Control Panel</h2>
+
+    <div id="login-panel" class="panel">
+        <h3>Login</h3>
+        <input type="text" id="username" placeholder="Enter any username">
+        <input type="password" id="password" placeholder="Password (password123)">
+        <button onclick="login()">Log In</button>
+        <p id="login-status" style="color: red;"></p>
+    </div>
+
+    <div id="dashboard-panel" class="panel hidden">
+        <h3>Live Aggregator</h3>
+        <p>Total Global Interactions: <strong id="click-display">0</strong></p>
+        <div id="aggregator-log"></div>
+        
+        <hr>
+        <h4>Controls</h4>
+        <button onclick="updateBackendState()">Trigger Interaction</button>
+        <button class="osc-btn" onclick="sendOSC()">Fire OSC Message</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io(); // Automatically connects to the server
+
+        // Listen for real-time broadcasts
+        socket.on('aggregator_update', (data) => {
+            document.getElementById('click-display').innerText = data.count;
+            
+            const log = document.getElementById('aggregator-log');
+            log.innerHTML += `<div>> ${data.message}</div>`;
+            log.scrollTop = log.scrollHeight; // Auto-scroll to bottom
+        });
+
+        async function login() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('login-panel').classList.add('hidden');
+                document.getElementById('dashboard-panel').classList.remove('hidden');
+            } else {
+                document.getElementById('login-status').innerText = data.message;
+            }
+        }
+
+        async function updateBackendState() {
+            await fetch('/api/interact', { method: 'POST' });
+        }
+
+        async function sendOSC() {
+            await fetch('/api/send-osc', { method: 'POST' });
+        }
+    </script>
+</body>
+</html>
