@@ -4,28 +4,36 @@ import torch
 import torch.nn.functional as F
 from transformers import GPT2LMHeadModel, PreTrainedTokenizerFast
 import argparse
+import threading
+import time
+from pythonosc import udp_client, dispatcher, osc_server
 from text_to_midi import text_to_midi
 
-def get_next_filename(output_dir, prefix="ai_drum_"):
-    """Finds the next available filename in the directory."""
+# Global client to talk back to Controller
+controller_client = udp_client.SimpleUDPClient("127.0.0.1", 11002)
+# Global client to talk to Multitrack Generator
+multitrack_client = udp_client.SimpleUDPClient("127.0.0.1", 11004)
+
+def get_next_filename(output_dir, genre, prefix="ai_drum_"):
     os.makedirs(output_dir, exist_ok=True)
-    existing_files = glob.glob(os.path.join(output_dir, f"{prefix}*.mid"))
-    
+    pattern = os.path.join(output_dir, f"{prefix}{genre}_*.mid")
+    existing_files = glob.glob(pattern)
     max_num = 0
     for f in existing_files:
         try:
             basename = os.path.basename(f)
-            num_str = basename.replace(prefix, "").replace(".mid", "")
-            num = int(num_str)
-            if num > max_num:
-                max_num = num
-        except ValueError:
+            parts = basename.replace(prefix, "").replace(".mid", "").split("_")
+            if len(parts) >= 2:
+                num = int(parts[-1])
+                if num > max_num:
+                    max_num = num
+        except (ValueError, IndexError):
             continue
-            
     return max_num + 1
 
-def generate_drums(model_dir, output_dir, genre, bpm, beat_type, sig, length=150, temperature=1.0, top_k=50, top_p=0.9):
-    print(f"Loading Drum Model from {model_dir}...")
+def generate_drums(model_dir, output_dir, genre, bpm, beat_type, sig, length=150, temperature=1.0, top_k=50, top_p=0.9, auto_fire=True):
+    print(f"\n[DRUMS] Generating for Genre: {genre} (Auto-fire: {auto_fire})...")
+    
     tokenizer = PreTrainedTokenizerFast(
         tokenizer_file=os.path.join(model_dir, "tokenizer.json"),
         bos_token="<|endoftext|>",
@@ -34,22 +42,17 @@ def generate_drums(model_dir, output_dir, genre, bpm, beat_type, sig, length=150
         pad_token="<|pad|>"
     )
     model = GPT2LMHeadModel.from_pretrained(model_dir)
-    
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)
     model.eval()
 
-    # Build the Metadata Prompt precisely matching our tokenization scheme
     prompt_tokens = [f"<GENRE_{genre}>", f"<BPM_{bpm}>", f"<TYPE_{beat_type}>", f"<SIG_{sig}>", "<New_Bar>", "<Pos_1>"]
     prompt_text = " ".join(prompt_tokens)
-    
-    # Determine the next file number
-    next_id = get_next_filename(output_dir)
-    midi_filename = f"ai_drum_{next_id}.mid"
+
+    next_id = get_next_filename(output_dir, genre)
+    midi_filename = f"ai_drum_{genre}_{next_id}.mid"
     output_midi_path = os.path.join(output_dir, midi_filename)
-    
-    print(f"Generating drums based on prompt: {prompt_text}")
-    print(f"Targeting: {midi_filename}")
 
     input_ids = tokenizer.encode(prompt_text, return_tensors="pt").to(device)
 
@@ -67,31 +70,48 @@ def generate_drums(model_dir, output_dir, genre, bpm, beat_type, sig, length=150
         )
 
     generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
-    
-    temp_txt_path = os.path.join(output_dir, f"temp_drum_{next_id}.txt")
+    temp_txt_path = os.path.join(output_dir, f"temp_drum_{genre}_{next_id}.txt")
     with open(temp_txt_path, "w", encoding="utf-8") as f:
         f.write(generated_text)
-        
-    print(f"Generation successful. Reconstructing MIDI...")
+
     text_to_midi(temp_txt_path, output_midi_path)
-    
     if os.path.exists(temp_txt_path):
         os.remove(temp_txt_path)
-        
-    print(f"Done! New MIDI file: {output_midi_path}")
+
+    print(f"[DRUMS] Done! Saved to: {output_midi_path}")
+    controller_client.send_message("/web/midi/process_file", [output_midi_path, int(auto_fire)])
+    return output_midi_path
+
+def generate_full_ensemble(genre):
+    # 1. Generate first drum phrase (auto-fire)
+    drum_midi_1 = generate_drums(MODEL_DIR, OUTPUT_DIR, genre, "120", "beat", "4-4", auto_fire=True)
+    
+    # 2. Trigger multitrack pipeline using this drum midi as seed
+    print(f"[OSC] Triggering multitrack pipeline for {genre}...")
+    multitrack_client.send_message("/web/multitrack_request", [drum_midi_1, genre])
+    
+    # 3. Generate second drum phrase (silent)
+    time.sleep(1) # Gap to allow multitrack trigger to start
+    generate_drums(MODEL_DIR, OUTPUT_DIR, genre, "120", "beat", "4-4", auto_fire=False)
+
+def osc_handler(address, *args):
+    genre = str(args[0]).lower() if args else "rock"
+    print(f"[OSC] Received trigger for {genre}. Starting ensemble sequence...")
+    threading.Thread(target=generate_full_ensemble, args=(genre,)).start()
+
+def main():
+    global MODEL_DIR, OUTPUT_DIR
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
+    MODEL_DIR = os.path.join(curr_dir, "model_output", "final_model")
+    OUTPUT_DIR = os.path.join(curr_dir, "midi_generate")
+
+    disp = dispatcher.Dispatcher()
+    disp.map("/web/generate_request", osc_handler)
+
+    server = osc_server.ThreadingOSCUDPServer(("127.0.0.1", 11003), disp)
+    print("Drum/Master Generator OSC Server started on 11003...")
+    server.serve_forever()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate Drum MIDI using Metadata Tags.")
-    curr_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    parser.add_argument("--model_dir", default=os.path.join(curr_dir, "model_output", "final_model"), help="Path to the saved model directory")
-    parser.add_argument("--output_dir", default=os.path.join(curr_dir, "midi_generate"), help="Directory to save the generated files")
-    parser.add_argument("--genre", default="rock", help="Genre tag (e.g., rock, funk, jazz)")
-    parser.add_argument("--bpm", default="120", help="BPM tag (e.g., 88, 120)")
-    parser.add_argument("--type", default="beat", help="Beat type (e.g., beat, fill)")
-    parser.add_argument("--sig", default="4-4", help="Time signature (e.g., 4-4, 6-8)")
-    parser.add_argument("--length", type=int, default=150, help="Number of drum events")
-    
-    args = parser.parse_args()
-    
-    generate_drums(args.model_dir, args.output_dir, args.genre, args.bpm, args.type, args.sig, args.length)
+    main()
+
