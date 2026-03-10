@@ -1,7 +1,7 @@
 # AIMAP
 AI-Mediated Audience Participation
 
-#How to run
+# How to run
 1. You need a model to train, contact me for model or model training specs
 2. open 4 terminals and have torch and python-osc in your environments
 3. run generate_drum_phrase.py (Drum_pipeline)
