@@ -1,0 +1,64 @@
+<html>
+
+<head>
+
+<title>Admin Dashboard</title>
+<script src="/socket.io/socket.io.js"></script>
+
+</head>
+
+<body style="background:black;color:white;font-family:Arial;text-align:center;">
+
+<h1>Interaction Aggregator</h1>
+
+<h2>Total Interactions</h2>
+<div id="count" style="font-size:50px;">0</div>
+
+<h2>Latest Event</h2>
+<div id="message" style="color:#0f0;"></div>
+
+<h2>Submissions</h2>
+<div id="submissions"></div>
+
+<script>
+
+const socket = io();
+
+socket.on("aggregator_update",(data)=>{
+
+document.getElementById("count").textContent=data.count;
+document.getElementById("message").textContent=data.message;
+
+});
+
+socket.on("new_submission",(data)=>{
+
+const entry=document.createElement("div");
+
+const colorBox=document.createElement("span");
+
+colorBox.style.display="inline-block";
+colorBox.style.width="10px";
+colorBox.style.height="10px";
+colorBox.style.marginLeft="6px";
+
+colorBox.style.backgroundColor=
+"hsl("+data.color+",100%,50%)";
+
+entry.textContent=
+data.username+", "+
+data.genre+", "+
+data.tempo+", {"+
+data.instruments+"}";
+
+entry.appendChild(colorBox);
+
+document.getElementById("submissions").prepend(entry);
+
+});
+
+</script>
+
+</body>
+
+</html>
