@@ -1,0 +1,112 @@
+<html>
+<body style="background:black;color:white;text-align:center;font-family:Arial;">
+
+<h1>Audio Mode</h1>
+
+<form method="POST" action="/submit">
+
+<!-- Genre Dropdown -->
+<select name="genre" required>
+  <option value="">Select Genre</option>
+  <option value="Rock">Rock</option>
+  <option value="Jazz">Jazz</option>
+  <option value="Hip-Hop">Hip-Hop</option>
+  <option value="Latin">Latin</option>
+  <option value="Funk">Funk</option>
+</select><br><br>
+
+<label>Tempo <span id="tempoValue">80</span></label><br>
+<input type="range" id="tempo" name="tempo" min="80" max="180" value="80"><br><br>
+
+<!-- Guitar -->
+<div>
+  <label><input type="checkbox" value="guitar" class="instrument"> Guitar</label>
+  <label><input type="checkbox" value="GEffect_1" class="guitarEffect"> Effect 1</label>
+  <label><input type="checkbox" value="GEffect_2" class="guitarEffect"> Effect 2</label>
+</div>
+
+<!-- Bass -->
+<div>
+  <label><input type="checkbox" value="bass" class="instrument"> Bass</label>
+  <label><input type="checkbox" value="BEffect_1" class="bassEffect"> Effect 1</label>
+  <label><input type="checkbox" value="BEffect_2" class="bassEffect"> Effect 2</label>
+</div>
+
+<!-- Piano -->
+<div>
+  <label><input type="checkbox" value="piano" class="instrument"> Piano</label>
+  <label><input type="checkbox" value="PEffect_1" class="pianoEffect"> Effect 1</label>
+  <label><input type="checkbox" value="PEffect_2" class="pianoEffect"> Effect 2</label>
+</div>
+
+<!-- Strings -->
+<div>
+  <label><input type="checkbox" value="strings" class="instrument"> Strings</label>
+  <label><input type="checkbox" value="SEffect_1" class="stringsEffect"> Effect 1</label>
+  <label><input type="checkbox" value="SEffect_2" class="stringsEffect"> Effect 2</label>
+</div>
+
+<input type="hidden" name="instruments" id="instrumentHidden">
+
+<br><button>Submit</button>
+
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+socket.on("redirect_clients", d => window.location.href = d.page);
+
+const tempo = document.getElementById("tempo");
+const val = document.getElementById("tempoValue");
+tempo.oninput = () => val.textContent = tempo.value;
+
+const hidden = document.getElementById("instrumentHidden");
+
+function updateInstruments() {
+    const data = {};
+
+    // Guitar
+    if (document.querySelector('input[value="guitar"]').checked) {
+        data.guitar = {
+            effects: [...document.querySelectorAll(".guitarEffect:checked")]
+                     .map(e => e.value)
+        };
+    }
+
+    // Bass
+    if (document.querySelector('input[value="bass"]').checked) {
+        data.bass = {
+            effects: [...document.querySelectorAll(".bassEffect:checked")]
+                     .map(e => e.value)
+        };
+    }
+
+    // Piano
+    if (document.querySelector('input[value="piano"]').checked) {
+        data.piano = {
+            effects: [...document.querySelectorAll(".pianoEffect:checked")]
+                     .map(e => e.value)
+        };
+    }
+
+    // Strings
+    if (document.querySelector('input[value="strings"]').checked) {
+        data.strings = {
+            effects: [...document.querySelectorAll(".stringsEffect:checked")]
+                     .map(e => e.value)
+        };
+    }
+
+    hidden.value = JSON.stringify(data);
+}
+
+// Attach listeners
+document.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    cb.onchange = updateInstruments;
+});
+</script>
+
+</body>
+</html>

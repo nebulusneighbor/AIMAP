@@ -1,0 +1,211 @@
+<html>
+<body style="background:black;color:white;text-align:center;font-family:Arial;">
+
+<h1>Audio + Visual Mode</h1>
+
+<form method="POST" action="/submit">
+
+<!-- GENRE -->
+<select name="genre" required>
+  <option value="">Select Genre</option>
+  <option value="Rock">Rock</option>
+  <option value="Jazz">Jazz</option>
+  <option value="Hip-Hop">Hip-Hop</option>
+  <option value="Latin">Latin</option>
+  <option value="Funk">Funk</option>
+</select><br><br>
+
+<!-- TEMPO -->
+<label>Tempo <span id="tempoValue">80</span></label><br>
+<input type="range" id="tempo" name="tempo" min="80" max="180" value="80"><br><br>
+
+<!-- INSTRUMENTS -->
+<h3>Instruments</h3>
+
+<div>
+  <label><input type="checkbox" value="guitar"> Guitar</label>
+  <label><input type="checkbox" value="GEffect_1" class="guitarEffect"> Effect 1</label>
+  <label><input type="checkbox" value="GEffect_2" class="guitarEffect"> Effect 2</label>
+</div>
+
+<div>
+  <label><input type="checkbox" value="bass"> Bass</label>
+  <label><input type="checkbox" value="BEffect_1" class="bassEffect"> Effect 1</label>
+  <label><input type="checkbox" value="BEffect_2" class="bassEffect"> Effect 2</label>
+</div>
+
+<div>
+  <label><input type="checkbox" value="piano"> Piano</label>
+  <label><input type="checkbox" value="PEffect_1" class="pianoEffect"> Effect 1</label>
+  <label><input type="checkbox" value="PEffect_2" class="pianoEffect"> Effect 2</label>
+</div>
+
+<div>
+  <label><input type="checkbox" value="strings"> Strings</label>
+  <label><input type="checkbox" value="SEffect_1" class="stringsEffect"> Effect 1</label>
+  <label><input type="checkbox" value="SEffect_2" class="stringsEffect"> Effect 2</label>
+</div>
+
+<input type="hidden" name="instruments" id="instrumentHidden">
+
+<br><br>
+
+<!-- COLOR -->
+<h3>Visuals</h3>
+
+<label>Background Color <span id="colorValue">0</span></label><br>
+<input type="range" id="color" name="color" min="0" max="360" value="0"><br>
+
+<div id="box" style="width:100px;height:100px;margin:auto;background:hsl(0,100%,50%);"></div>
+
+<br><br>
+
+<!-- DANCERS -->
+<h3>Background Dancers</h3>
+
+<div>
+  <label>D1 Dance</label>
+  <select name="dancer1_dance">
+    <option value="dance1">dance1</option>
+    <option value="dance2">dance2</option>
+    <option value="dance3">dance3</option>
+  </select> <br><br>
+
+  <label>D1 Model</label>
+  <select name="dancer1_model">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select> <br><br>
+</div>
+
+<br>
+
+<div>
+  <label>D2 Dance</label>
+  <select name="dancer2_dance">
+    <option value="dance1">dance1</option>
+    <option value="dance2">dance2</option>
+    <option value="dance3">dance3</option>
+  </select> <br><br>
+
+  <label>D2 Model</label>
+  <select name="dancer2_model">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select> <br><br>
+</div>
+
+<br><br>
+
+<!-- PERFORMERS -->
+<h3>Performer Skins</h3>
+
+<div>
+  Dr1 <select name="drummer1">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select> <br><br>
+
+  Dr2 <select name="drummer2">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select> <br><br>
+</div>
+
+<br>
+
+<div>
+  Guitar <select name="guitar_skin">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select> <br><br>
+
+  Bass <select name="bass_skin">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select> <br><br>
+
+  Piano <select name="piano_skin">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select> <br><br>
+
+  Strings <select name="strings_skin">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select> <br><br>
+</div>
+
+<br><br>
+<button>Submit</button>
+
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+socket.on("redirect_clients", d => window.location.href = d.page);
+
+// TEMPO
+const tempo = document.getElementById("tempo");
+const tempoValue = document.getElementById("tempoValue");
+tempo.oninput = () => tempoValue.textContent = tempo.value;
+
+// COLOR
+const color = document.getElementById("color");
+const box = document.getElementById("box");
+const colorValue = document.getElementById("colorValue");
+
+color.oninput = () => {
+    colorValue.textContent = color.value;
+    box.style.background = `hsl(${color.value},100%,50%)`;
+};
+
+// INSTRUMENT JSON (same as audio page)
+const hidden = document.getElementById("instrumentHidden");
+
+function updateInstruments() {
+    const data = {};
+
+    if (document.querySelector('input[value="guitar"]').checked) {
+        data.guitar = {
+            effects: [...document.querySelectorAll(".guitarEffect:checked")].map(e => e.value)
+        };
+    }
+
+    if (document.querySelector('input[value="bass"]').checked) {
+        data.bass = {
+            effects: [...document.querySelectorAll(".bassEffect:checked")].map(e => e.value)
+        };
+    }
+
+    if (document.querySelector('input[value="piano"]').checked) {
+        data.piano = {
+            effects: [...document.querySelectorAll(".pianoEffect:checked")].map(e => e.value)
+        };
+    }
+
+    if (document.querySelector('input[value="strings"]').checked) {
+        data.strings = {
+            effects: [...document.querySelectorAll(".stringsEffect:checked")].map(e => e.value)
+        };
+    }
+
+    hidden.value = JSON.stringify(data);
+}
+
+document.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    cb.onchange = updateInstruments;
+});
+</script>
+
+</body>
+</html>

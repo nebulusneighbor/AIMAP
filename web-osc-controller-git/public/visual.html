@@ -1,0 +1,136 @@
+<html>
+<body style="background:black;color:white;text-align:center;font-family:Arial;">
+
+<h1>Visual Mode</h1>
+
+<form method="POST" action="/submit">
+
+<!-- Color -->
+<label>Background Color <span id="colorValue"></span></label><br>
+<input type="range" id="color" name="color" min="0" max="360" value="0"><br><br>
+
+<div id="box" style="width:100px;height:100px;margin:auto;background:hsl(0,100%,50%);"></div>
+
+<br><br>
+
+<!-- Background Dancers -->
+<h3>Background Dancers</h3>
+
+<!-- Dancer 1 -->
+<div>
+  <label>Dancer 1 Dance</label>
+  <select name="dancer1_dance" required>
+    <option value="dance1">dance1</option>
+    <option value="dance2">dance2</option>
+    <option value="dance3">dance3</option>
+  </select>
+
+  <label>Dancer 1 Model</label>
+  <select name="dancer1_model" required>
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select>
+</div>
+
+<br>
+
+<!-- Dancer 2 -->
+<div>
+  <label>Dancer 2 Dance</label>
+  <select name="dancer2_dance" required>
+    <option value="dance1">dance1</option>
+    <option value="dance2">dance2</option>
+    <option value="dance3">dance3</option>
+  </select>
+
+  <label>Dancer 2 Model</label>
+  <select name="dancer2_model" required>
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select>
+</div>
+
+<br><br>
+
+<!-- Performer Skins -->
+<h3>Performer Skins</h3>
+
+<!-- Drummers -->
+<div>
+  <label>Drummer 1</label>
+  <select name="drummer1">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select><br><br>
+
+  <label>Drummer 2</label>
+  <select name="drummer2">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select><br><br>
+</div>
+
+<br>
+
+<!-- Band -->
+<div>
+  <label>Guitar</label>
+  <select name="guitar_skin">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select><br><br>
+
+  <label>Bass</label>
+  <select name="bass_skin">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select><br><br>
+
+  <label>Piano</label>
+  <select name="piano_skin">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select><br><br>
+
+  <label>Strings</label>
+  <select name="strings_skin">
+    <option value="model1">model1</option>
+    <option value="model2">model2</option>
+    <option value="model3">model3</option>
+  </select><br><br>
+</div>
+
+<!-- Hidden fields to match backend -->
+<input type="hidden" name="genre" value="visual">
+<input type="hidden" name="instruments" value="visual">
+
+<br><br>
+<button>Submit</button>
+
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+socket.on("redirect_clients", d => window.location.href = d.page);
+
+const color = document.getElementById("color");
+const box = document.getElementById("box");
+const colorValue = document.getElementById("colorValue");
+
+color.oninput = () => {
+    const val = color.value;
+    colorValue.textContent = val;
+    box.style.background = `hsl(${val},100%,50%)`;
+};
+</script>
+
+</body>
+</html>

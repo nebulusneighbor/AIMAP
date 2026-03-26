@@ -1,64 +1,113 @@
 <html>
-
 <head>
-
-<title>Admin Dashboard</title>
 <script src="/socket.io/socket.io.js"></script>
-
 </head>
 
-<body style="background:black;color:white;font-family:Arial;text-align:center;">
+<body style="background:black;color:white;text-align:center;font-family:Arial;">
 
-<h1>Interaction Aggregator</h1>
+<h1>Admin Dashboard</h1>
 
-<h2>Total Interactions</h2>
-<div id="count" style="font-size:50px;">0</div>
+<h2 id="count">0</h2>
+<div id="message"></div>
 
-<h2>Latest Event</h2>
-<div id="message" style="color:#0f0;"></div>
+<h2>Controls</h2>
+<button onclick="send('audio','audio.html')">Audio</button>
+<button onclick="send('visual','visual.html')">Visual</button>
+<button onclick="send('all','both.html')">All</button>
+
+<h2>Users</h2>
+
+<div style="display:flex;justify-content:center;gap:40px;">
+<div><h3>Audio</h3><div id="audioUsers"></div></div>
+<div><h3>Visual</h3><div id="visualUsers"></div></div>
+<div><h3>Both</h3><div id="bothUsers"></div></div>
+</div>
 
 <h2>Submissions</h2>
-<div id="submissions"></div>
+<div id="subs"></div>
 
 <script>
-
 const socket = io();
 
-socket.on("aggregator_update",(data)=>{
+function send(group,page){
+    socket.emit("force_redirect",{group,page});
+}
 
-document.getElementById("count").textContent=data.count;
-document.getElementById("message").textContent=data.message;
-
+socket.on("aggregator_update",d=>{
+    count.textContent = d.count;
+    message.textContent = d.message;
 });
 
-socket.on("new_submission",(data)=>{
+socket.on("new_submission", d => {
+    const div = document.createElement("div");
 
-const entry=document.createElement("div");
+    // --- Instruments (audio JSON parsing) ---
+    let instrumentsText = "";
+    try {
+        const parsed = JSON.parse(d.instruments);
 
-const colorBox=document.createElement("span");
+        instrumentsText = Object.entries(parsed).map(([instrument, data]) => {
+            const effects = data.effects.length
+                ? ` (Effects: ${data.effects.join(", ")})`
+                : "";
+            return `${instrument}${effects}`;
+        }).join(" | ");
 
-colorBox.style.display="inline-block";
-colorBox.style.width="10px";
-colorBox.style.height="10px";
-colorBox.style.marginLeft="6px";
+    } catch (e) {
+        instrumentsText = d.instruments;
+    }
 
-colorBox.style.backgroundColor=
-"hsl("+data.color+",100%,50%)";
+    // --- Dancers + Models (NEW) ---
+    const dancerText = `
+        D1: ${d.dancer1_dance || "-"} / ${d.dancer1_model || "-"}
+        | D2: ${d.dancer2_dance || "-"} / ${d.dancer2_model || "-"}
+    `;
 
-entry.textContent=
-data.username+", "+
-data.genre+", "+
-data.tempo+", {"+
-data.instruments+"}";
+    // --- Performer Skins (NEW) ---
+    const performerText = `
+        Dr1: ${d.drummer1 || "-"},
+        Dr2: ${d.drummer2 || "-"},
+        G: ${d.guitar_skin || "-"},
+        B: ${d.bass_skin || "-"},
+        P: ${d.piano_skin || "-"},
+        S: ${d.strings_skin || "-"}
+    `;
 
-entry.appendChild(colorBox);
+    // --- Final Output ---
+    div.textContent =
+        `${d.username} | ${d.genre} | ${d.tempo || "-"} BPM | ` +
+        `${instrumentsText} | ${d.color || "-"} | ` +
+        `${dancerText} | ${performerText}`;
 
-document.getElementById("submissions").prepend(entry);
-
+    subs.prepend(div);
 });
 
+socket.on("user_list_update",g=>{
+    render("audioUsers",g.audio,"audio");
+    render("visualUsers",g.visual,"visual");
+    render("bothUsers",g.both,"both");
+});
+
+function render(id,users,current){
+    const el=document.getElementById(id);
+    el.innerHTML="";
+    users.forEach(u=>{
+        const d=document.createElement("div");
+        d.textContent=u.username+" ";
+
+        ["audio","visual","both"].forEach(g=>{
+            if(g!==current){
+                const b=document.createElement("button");
+                b.textContent=g;
+                b.onclick=()=>socket.emit("move_user",{socketId:u.socketId,newGroup:g});
+                d.appendChild(b);
+            }
+        });
+
+        el.appendChild(d);
+    });
+}
 </script>
 
 </body>
-
 </html>
