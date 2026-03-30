@@ -1,0 +1,100 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Addressables generated files
+Unity/Assets/AddressableAssetsData/*/*.bin*
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity3D generated meta files
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Unity generated files
+sysinfo.txt
+*.stacktrace
+
+# Build outputs
+*.apk
+*.aab
+*.unitypackage
+*.app
+*.exe
+
+# Crash reports
+crashlytics-build.properties
+
+# OS and temp files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+*.utmp
+.utmp
+
+# Unity minimal-share mode:
+# Ignore the whole Unity workspace by default, then allow only the project files
+# needed for code/scene/settings collaboration.
+Unity/**
+!Unity/AIMAP/
+Unity/AIMAP/**
+!Unity/AIMAP/Packages/
+!Unity/AIMAP/Packages/**
+!Unity/AIMAP/ProjectSettings/
+!Unity/AIMAP/ProjectSettings/**
+!Unity/AIMAP/Assets/
+!Unity/AIMAP/Assets/Editor/
+!Unity/AIMAP/Assets/Editor/**
+!Unity/AIMAP/Assets/Scripts/
+!Unity/AIMAP/Assets/Scripts/**
+!Unity/AIMAP/Assets/Scenes/
+!Unity/AIMAP/Assets/Scenes/**
+!Unity/AIMAP/Assets/Settings/
+!Unity/AIMAP/Assets/Settings/**
+!Unity/AIMAP/Assets/InputSystem_Actions.inputactions
+!Unity/AIMAP/Assets/InputSystem_Actions.inputactions.meta
+!Unity/AIMAP/Assets/Editor.meta
+!Unity/AIMAP/Assets/Scripts.meta
+!Unity/AIMAP/Assets/Scenes.meta
+!Unity/AIMAP/Assets/Settings.meta
+
+# Always keep heavy binary assets out of git (share separately)
+Unity/AIMAP/Assets/**/*.fbx
+Unity/AIMAP/Assets/**/*.glb
+Unity/AIMAP/Assets/**/*.gltf
+Unity/AIMAP/Assets/**/*.exr
+Unity/AIMAP/Assets/**/*.zip
+Unity/AIMAP/Assets/**/Gemini_Generated_*.png
+Unity/AIMAP/ExternalAssets/
+
