@@ -8,6 +8,9 @@ namespace AIMAP.Environment
         [SerializeField] private Material[] skyboxMaterials;
         [SerializeField] private int defaultSkyboxIndex;
         [SerializeField] private bool applyOnStart = true;
+        [SerializeField] private int trainingStageSkyboxIndex;
+        [SerializeField] private GameObject trainingStageGlowObject;
+        [SerializeField] private string trainingStageGlowObjectName = "PolygonGrid_Glow";
 
         private AimapOscDiagnostics _diagnostics;
         private int _currentSkyboxIndex;
@@ -23,6 +26,7 @@ namespace AIMAP.Environment
         private void Start()
         {
             _diagnostics = GetComponent<AimapOscDiagnostics>();
+            ResolveTrainingStageGlowObject();
 
             if (applyOnStart)
             {
@@ -45,8 +49,31 @@ namespace AIMAP.Environment
             }
 
             RenderSettings.skybox = skyboxMaterial;
+            UpdateTrainingStageGlowState();
             DynamicGI.UpdateEnvironment();
             _diagnostics?.RegisterSkyboxChange(_currentSkyboxIndex);
+        }
+
+        private void ResolveTrainingStageGlowObject()
+        {
+            if (trainingStageGlowObject != null || string.IsNullOrWhiteSpace(trainingStageGlowObjectName))
+            {
+                return;
+            }
+
+            trainingStageGlowObject = GameObject.Find(trainingStageGlowObjectName);
+        }
+
+        private void UpdateTrainingStageGlowState()
+        {
+            ResolveTrainingStageGlowObject();
+
+            if (trainingStageGlowObject == null)
+            {
+                return;
+            }
+
+            trainingStageGlowObject.SetActive(_currentSkyboxIndex == trainingStageSkyboxIndex);
         }
     }
 }
