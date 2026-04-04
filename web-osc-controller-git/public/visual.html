@@ -1,136 +1,119 @@
-<html>
-<body style="background:black;color:white;text-align:center;font-family:Arial;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AIMAP - Visual Mode</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .character-box { background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 16px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.05); text-align: left; }
+        .character-box h4 { font-size: 0.9rem; margin-bottom: 1rem; color: var(--primary-color); text-transform: uppercase; border-bottom: 1px solid rgba(0, 242, 254, 0.2); padding-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="dots"></div>
+    <div class="login-container" style="max-width: 900px;">
+        <h1>Visual Parameters</h1>
+        <form method="POST" action="/submit">
+            
+            <div class="input-group">
+                <h3>Environment</h3>
+                <select name="environment" required>
+                    <option value="haunted forest">Haunted Forest</option>
+                    <option value="mars scape">Mars Scape</option>
+                    <option value="laser grid">Laser Grid</option>
+                </select>
+            </div>
 
-<h1>Visual Mode</h1>
+            <div class="grid-2">
+                <div>
+                    <h3>Backup Dancers</h3>
+                    <div class="character-box">
+                        <h4>Dancer 1 Selection</h4>
+                        <div class="dancer-config-group">
+                            <div>
+                                <span class="option-tag">Choose Character</span>
+                                <select name="d1_character" class="all-chars-sel"></select>
+                            </div>
+                            <div>
+                                <span class="option-tag">Choose Dance Move</span>
+                                <select name="d1_move">
+                                    <option value="hiphop">Hip Hop</option>
+                                    <option value="breakdance">Breakdance</option>
+                                    <option value="latin">Latin</option>
+                                    <option value="drink">1 Less Drink</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-<form method="POST" action="/submit">
+                    <div class="character-box">
+                        <h4>Dancer 2 Selection</h4>
+                        <div class="dancer-config-group">
+                            <div>
+                                <span class="option-tag">Choose Character</span>
+                                <select name="d2_character" class="all-chars-sel"></select>
+                            </div>
+                            <div>
+                                <span class="option-tag">Choose Dance Move</span>
+                                <select name="d2_move">
+                                    <option value="hiphop">Hip Hop</option>
+                                    <option value="breakdance">Breakdance</option>
+                                    <option value="latin">Latin</option>
+                                    <option value="drink">1 Less Drink</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<!-- Color -->
-<label>Background Color <span id="colorValue"></span></label><br>
-<input type="range" id="color" name="color" min="0" max="360" value="0"><br><br>
+                <div>
+                    <h3>Band Members</h3>
+                    <div class="stat-card" style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                        <span class="option-tag" style="margin-bottom: 1rem;">Choose Individual Avatars</span>
+                        <div style="font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div><label style="font-size: 0.7rem; color: var(--primary-color);">Drummer 1</label><select name="drum1_char" class="all-chars-sel"></select></div>
+                            <div><label style="font-size: 0.7rem; color: var(--primary-color);">Drummer 2</label><select name="drum2_char" class="all-chars-sel"></select></div>
+                            <div><label style="font-size: 0.7rem; color: var(--primary-color);">Avatar Guitar</label><select name="guitar_char" class="all-chars-sel"></select></div>
+                            <div><label style="font-size: 0.7rem; color: var(--primary-color);">Bass</label><select name="bass_char" class="all-chars-sel"></select></div>
+                            <div><label style="font-size: 0.7rem; color: var(--primary-color);">Piano</label><select name="piano_char" class="all-chars-sel"></select></div>
+                            <div><label style="font-size: 0.7rem; color: var(--primary-color);">Strings</label><select name="strings_char" class="all-chars-sel"></select></div>
+                            <div><label style="font-size: 0.7rem; color: var(--primary-color);">Winds</label><select name="winds_char" class="all-chars-sel"></select></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-<div id="box" style="width:100px;height:100px;margin:auto;background:hsl(0,100%,50%);"></div>
+            <input type="hidden" name="genre" value="visual">
+            <input type="hidden" name="instruments" value="visual">
+            <button type="submit" style="margin-top: 2rem;">Lock In Visuals</button>
+        </form>
+    </div>
 
-<br><br>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.on("redirect_clients", d => window.location.href = d.page);
 
-<!-- Background Dancers -->
-<h3>Background Dancers</h3>
+        const allCharacters = [
+            { group: "Monsters", members: ["Vampire", "Werewolf", "Moose Orc", "Goblin Elf"] },
+            { group: "Aliens", members: ["Flesh Eater", "Dark Noire", "Lizard Species", "Webbed and Armored"] },
+            { group: "Robots", members: ["X-Bot", "Y-Bot"] }
+        ];
 
-<!-- Dancer 1 -->
-<div>
-  <label>Dancer 1 Dance</label>
-  <select name="dancer1_dance" required>
-    <option value="dance1">dance1</option>
-    <option value="dance2">dance2</option>
-    <option value="dance3">dance3</option>
-  </select>
+        function populateSelects() {
+            const selects = document.querySelectorAll(".all-chars-sel");
+            let html = "";
+            allCharacters.forEach(g => {
+                html += `<optgroup label="${g.group}">`;
+                g.members.forEach(m => {
+                    html += `<option value="${m.toLowerCase().replace(/ /g, '_')}">${m}</option>`;
+                });
+                html += `</optgroup>`;
+            });
+            selects.forEach(s => s.innerHTML = html);
+        }
 
-  <label>Dancer 1 Model</label>
-  <select name="dancer1_model" required>
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select>
-</div>
-
-<br>
-
-<!-- Dancer 2 -->
-<div>
-  <label>Dancer 2 Dance</label>
-  <select name="dancer2_dance" required>
-    <option value="dance1">dance1</option>
-    <option value="dance2">dance2</option>
-    <option value="dance3">dance3</option>
-  </select>
-
-  <label>Dancer 2 Model</label>
-  <select name="dancer2_model" required>
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select>
-</div>
-
-<br><br>
-
-<!-- Performer Skins -->
-<h3>Performer Skins</h3>
-
-<!-- Drummers -->
-<div>
-  <label>Drummer 1</label>
-  <select name="drummer1">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select><br><br>
-
-  <label>Drummer 2</label>
-  <select name="drummer2">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select><br><br>
-</div>
-
-<br>
-
-<!-- Band -->
-<div>
-  <label>Guitar</label>
-  <select name="guitar_skin">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select><br><br>
-
-  <label>Bass</label>
-  <select name="bass_skin">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select><br><br>
-
-  <label>Piano</label>
-  <select name="piano_skin">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select><br><br>
-
-  <label>Strings</label>
-  <select name="strings_skin">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select><br><br>
-</div>
-
-<!-- Hidden fields to match backend -->
-<input type="hidden" name="genre" value="visual">
-<input type="hidden" name="instruments" value="visual">
-
-<br><br>
-<button>Submit</button>
-
-</form>
-
-<script src="/socket.io/socket.io.js"></script>
-<script>
-const socket = io();
-socket.on("redirect_clients", d => window.location.href = d.page);
-
-const color = document.getElementById("color");
-const box = document.getElementById("box");
-const colorValue = document.getElementById("colorValue");
-
-color.oninput = () => {
-    const val = color.value;
-    colorValue.textContent = val;
-    box.style.background = `hsl(${val},100%,50%)`;
-};
-</script>
-
+        populateSelects();
+    </script>
 </body>
 </html>

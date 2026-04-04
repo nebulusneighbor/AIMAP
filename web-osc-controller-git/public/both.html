@@ -1,211 +1,120 @@
-<html>
-<body style="background:black;color:white;text-align:center;font-family:Arial;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AIMAP - Full Session</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .character-box { background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; margin-bottom: 0.8rem; border: 1px solid rgba(255,255,255,0.05); text-align: left; }
+        .character-box h4 { font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--primary-color); text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div class="dots"></div>
+    <div class="login-container" style="max-width: 1000px;">
+        <h1>Full Parameters</h1>
+        <form method="POST" action="/submit">
+            
+            <div class="grid-2">
+                <!-- LEFT COLUMN: MUSICAL -->
+                <div>
+                    <div class="grid-2">
+                        <div class="input-group"><h3>Musical Feel</h3><select name="genre" required><option value="drive/rock">Drive / Rock</option><option value="pulse/hiphop">Pulse / HipHop</option><option value="groove/funky">Groove / Funky</option><option value="elegant/atmospheric">Elegant / Atmospheric</option></select></div>
+                        <div class="input-group"><h3>Musical Mode</h3><select name="mode" required><option value="major">Major</option><option value="minor">Minor</option></select></div>
+                    </div>
 
-<h1>Audio + Visual Mode</h1>
+                    <h3>Tempo</h3>
+                    <label>Current: <span id="tempoValue" style="color: var(--primary-color); font-weight: 800;">115</span> BPM</label>
+                    <input type="range" id="tempo" name="tempo" min="90" max="140" value="115">
 
-<form method="POST" action="/submit">
+                    <div class="stat-card" style="padding: 0.8rem; background: rgba(0, 242, 254, 0.05); border: 1px solid var(--primary-color); margin: 1rem 0;">
+                        <span class="option-tag">Set Human Guitar Tone</span>
+                        <div class="param-bubble" style="margin-top:5px">Tone <select name="human_guitar_tone"><option>1</option><option>2</option><option>3</option></select></div>
+                    </div>
 
-<!-- GENRE -->
-<select name="genre" required>
-  <option value="">Select Genre</option>
-  <option value="Rock">Rock</option>
-  <option value="Jazz">Jazz</option>
-  <option value="Hip-Hop">Hip-Hop</option>
-  <option value="Latin">Latin</option>
-  <option value="Funk">Funk</option>
-</select><br><br>
+                    <h3>Which avatar instruments?</h3>
+                    <div style="font-size: 0.8rem;">
+                        <div class="instrument-row"><div class="instrument-main"><label class="effect-label"><input type="checkbox" value="guitar"> Avatar Guitar</label></div><div class="param-bubble">FX <select name="guitar_fx"><option>1</option><option>2</option><option>3</option></select></div></div>
+                        <div class="instrument-row"><div class="instrument-main"><label class="effect-label"><input type="checkbox" value="bass"> Bass</label></div><div class="param-bubble">FX <select name="bass_fx"><option>1</option><option>2</option><option>3</option></select></div></div>
+                        <div class="instrument-row"><div class="instrument-main"><label class="effect-label"><input type="checkbox" value="piano"> Piano</label></div><div class="param-bubble">FX <select name="piano_fx"><option>1</option><option>2</option><option>3</option></select></div></div>
+                        <div class="instrument-row"><div class="instrument-main"><label class="effect-label"><input type="checkbox" value="strings"> Strings</label></div><div class="param-bubble">FX <select name="strings_fx"><option>1</option><option>2</option><option>3</option></select></div></div>
+                        <div class="instrument-row"><div class="instrument-main"><label class="effect-label"><input type="checkbox" value="winds"> Winds</label></div><div class="param-bubble">FX <select name="winds_fx"><option>1</option><option>2</option><option>3</option></select></div></div>
+                        <input type="hidden" name="instruments" id="instrumentHidden">
+                    </div>
+                </div>
 
-<!-- TEMPO -->
-<label>Tempo <span id="tempoValue">80</span></label><br>
-<input type="range" id="tempo" name="tempo" min="80" max="180" value="80"><br><br>
+                <!-- RIGHT COLUMN: VISUAL -->
+                <div>
+                    <h3>Environment</h3>
+                    <select name="environment"><option value="haunted forest">Haunted Forest</option><option value="mars scape">Mars Scape</option><option value="laser grid">Laser Grid</option></select>
 
-<!-- INSTRUMENTS -->
-<h3>Instruments</h3>
+                    <h3>Backup Dancers</h3>
+                    <div class="character-box">
+                        <h4>Dancer 1</h4>
+                        <div class="dancer-config-group">
+                            <div><span class="option-tag">Character</span><select name="d1_character" class="all-chars-sel"></select></div>
+                            <div><span class="option-tag">Dance Move</span><select name="d1_move"><option value="hiphop">Hip Hop</option><option value="breakdance">Breakdance</option><option value="latin">Latin</option><option value="drink">1 Less Drink</option></select></div>
+                        </div>
+                    </div>
+                    <div class="character-box">
+                        <h4>Dancer 2</h4>
+                        <div class="dancer-config-group">
+                            <div><span class="option-tag">Character</span><select name="d2_character" class="all-chars-sel"></select></div>
+                            <div><span class="option-tag">Dance Move</span><select name="d2_move"><option value="hiphop">Hip Hop</option><option value="breakdance">Breakdance</option><option value="latin">Latin</option><option value="drink">1 Less Drink</option></select></div>
+                        </div>
+                    </div>
 
-<div>
-  <label><input type="checkbox" value="guitar"> Guitar</label>
-  <label><input type="checkbox" value="GEffect_1" class="guitarEffect"> Effect 1</label>
-  <label><input type="checkbox" value="GEffect_2" class="guitarEffect"> Effect 2</label>
-</div>
+                    <h3>Band Members</h3>
+                    <div class="stat-card" style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                        <span class="option-tag">Individual Characters</span>
+                        <div style="margin-top: 1rem; font-size: 0.7rem; display: flex; flex-direction: column; gap: 4px;">
+                            <div><label style="color:var(--primary-color)">Drum 1</label><select name="drum1_char" class="all-chars-sel"></select></div>
+                            <div><label style="color:var(--primary-color)">Drum 2</label><select name="drum2_char" class="all-chars-sel"></select></div>
+                            <div><label style="color:var(--primary-color)">Avatar Guitar</label><select name="guitar_char" class="all-chars-sel"></select></div>
+                            <div><label style="color:var(--primary-color)">Bass</label><select name="bass_char" class="all-chars-sel"></select></div>
+                            <div><label style="color:var(--primary-color)">Piano</label><select name="piano_char" class="all-chars-sel"></select></div>
+                            <div><label style="color:var(--primary-color)">Strings</label><select name="strings_char" class="all-chars-sel"></select></div>
+                            <div><label style="color:var(--primary-color)">Winds</label><select name="winds_char" class="all-chars-sel"></select></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-<div>
-  <label><input type="checkbox" value="bass"> Bass</label>
-  <label><input type="checkbox" value="BEffect_1" class="bassEffect"> Effect 1</label>
-  <label><input type="checkbox" value="BEffect_2" class="bassEffect"> Effect 2</label>
-</div>
+            <button type="submit" style="margin-top: 2rem;">Lock In All Parameters</button>
+        </form>
+    </div>
 
-<div>
-  <label><input type="checkbox" value="piano"> Piano</label>
-  <label><input type="checkbox" value="PEffect_1" class="pianoEffect"> Effect 1</label>
-  <label><input type="checkbox" value="PEffect_2" class="pianoEffect"> Effect 2</label>
-</div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.on("redirect_clients", d => window.location.href = d.page);
+        const tempo = document.getElementById("tempo");
+        tempo.oninput = () => document.getElementById("tempoValue").textContent = tempo.value;
 
-<div>
-  <label><input type="checkbox" value="strings"> Strings</label>
-  <label><input type="checkbox" value="SEffect_1" class="stringsEffect"> Effect 1</label>
-  <label><input type="checkbox" value="SEffect_2" class="stringsEffect"> Effect 2</label>
-</div>
+        const allCharacters = [
+            { group: "Monsters", members: ["Vampire", "Werewolf", "Moose Orc", "Goblin Elf"] },
+            { group: "Aliens", members: ["Flesh Eater", "Dark Noire", "Lizard Species", "Webbed and Armored"] },
+            { group: "Robots", members: ["X-Bot", "Y-Bot"] }
+        ];
 
-<input type="hidden" name="instruments" id="instrumentHidden">
+        function populateSelects() {
+            const selects = document.querySelectorAll(".all-chars-sel");
+            let html = "";
+            allCharacters.forEach(g => {
+                html += `<optgroup label="${g.group}">`;
+                g.members.forEach(m => {
+                    html += `<option value="${m.toLowerCase().replace(/ /g, '_')}">${m}</option>`;
+                });
+                html += `</optgroup>`;
+            });
+            selects.forEach(s => s.innerHTML = html);
+        }
 
-<br><br>
+        const hidden = document.getElementById("instrumentHidden");
+        function updateInstruments() { const data = {}; ['guitar', 'bass', 'piano', 'strings', 'winds'].forEach(inst => { if (document.querySelector(`input[value="${inst}"]`).checked) data[inst] = true; }); hidden.value = JSON.stringify(data); }
+        document.querySelectorAll("input[type=checkbox]").forEach(cb => cb.onchange = updateInstruments);
 
-<!-- COLOR -->
-<h3>Visuals</h3>
-
-<label>Background Color <span id="colorValue">0</span></label><br>
-<input type="range" id="color" name="color" min="0" max="360" value="0"><br>
-
-<div id="box" style="width:100px;height:100px;margin:auto;background:hsl(0,100%,50%);"></div>
-
-<br><br>
-
-<!-- DANCERS -->
-<h3>Background Dancers</h3>
-
-<div>
-  <label>D1 Dance</label>
-  <select name="dancer1_dance">
-    <option value="dance1">dance1</option>
-    <option value="dance2">dance2</option>
-    <option value="dance3">dance3</option>
-  </select> <br><br>
-
-  <label>D1 Model</label>
-  <select name="dancer1_model">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select> <br><br>
-</div>
-
-<br>
-
-<div>
-  <label>D2 Dance</label>
-  <select name="dancer2_dance">
-    <option value="dance1">dance1</option>
-    <option value="dance2">dance2</option>
-    <option value="dance3">dance3</option>
-  </select> <br><br>
-
-  <label>D2 Model</label>
-  <select name="dancer2_model">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select> <br><br>
-</div>
-
-<br><br>
-
-<!-- PERFORMERS -->
-<h3>Performer Skins</h3>
-
-<div>
-  Dr1 <select name="drummer1">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select> <br><br>
-
-  Dr2 <select name="drummer2">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select> <br><br>
-</div>
-
-<br>
-
-<div>
-  Guitar <select name="guitar_skin">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select> <br><br>
-
-  Bass <select name="bass_skin">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select> <br><br>
-
-  Piano <select name="piano_skin">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select> <br><br>
-
-  Strings <select name="strings_skin">
-    <option value="model1">model1</option>
-    <option value="model2">model2</option>
-    <option value="model3">model3</option>
-  </select> <br><br>
-</div>
-
-<br><br>
-<button>Submit</button>
-
-</form>
-
-<script src="/socket.io/socket.io.js"></script>
-<script>
-const socket = io();
-socket.on("redirect_clients", d => window.location.href = d.page);
-
-// TEMPO
-const tempo = document.getElementById("tempo");
-const tempoValue = document.getElementById("tempoValue");
-tempo.oninput = () => tempoValue.textContent = tempo.value;
-
-// COLOR
-const color = document.getElementById("color");
-const box = document.getElementById("box");
-const colorValue = document.getElementById("colorValue");
-
-color.oninput = () => {
-    colorValue.textContent = color.value;
-    box.style.background = `hsl(${color.value},100%,50%)`;
-};
-
-// INSTRUMENT JSON (same as audio page)
-const hidden = document.getElementById("instrumentHidden");
-
-function updateInstruments() {
-    const data = {};
-
-    if (document.querySelector('input[value="guitar"]').checked) {
-        data.guitar = {
-            effects: [...document.querySelectorAll(".guitarEffect:checked")].map(e => e.value)
-        };
-    }
-
-    if (document.querySelector('input[value="bass"]').checked) {
-        data.bass = {
-            effects: [...document.querySelectorAll(".bassEffect:checked")].map(e => e.value)
-        };
-    }
-
-    if (document.querySelector('input[value="piano"]').checked) {
-        data.piano = {
-            effects: [...document.querySelectorAll(".pianoEffect:checked")].map(e => e.value)
-        };
-    }
-
-    if (document.querySelector('input[value="strings"]').checked) {
-        data.strings = {
-            effects: [...document.querySelectorAll(".stringsEffect:checked")].map(e => e.value)
-        };
-    }
-
-    hidden.value = JSON.stringify(data);
-}
-
-document.querySelectorAll("input[type=checkbox]").forEach(cb => {
-    cb.onchange = updateInstruments;
-});
-</script>
-
+        populateSelects();
+    </script>
 </body>
 </html>

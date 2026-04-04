@@ -1,113 +1,61 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<script src="/socket.io/socket.io.js"></script>
+    <meta charset="UTF-8">
+    <title>AIMAP - Admin Console</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; text-align: left; }
+        .stat-card { background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 16px; }
+        .btn-red { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); color: white; }
+    </style>
 </head>
+<body>
+    <div class="dots"></div>
+    <div class="login-container" style="max-width: 800px;">
+        <h1>AIMAP ADMIN</h1>
+        
+        <div class="admin-grid">
+            <div class="stat-card">
+                <h3>Control Phase</h3>
+                <label>Select Session Mode</label>
+                <select id="modeSelect">
+                    <option value="audio">Audio Parameters</option>
+                    <option value="visual">Visual Parameters</option>
+                    <option value="both" selected>Both (Full Session)</option>
+                </select>
+                <button onclick="sendCommand('start_vote')" style="margin-top: 1rem;">START SESSION</button>
+                <button onclick="sendCommand('lock_and_average')" style="margin-top: 1rem; background: var(--secondary-color);">LOCK & SHOW RESULTS</button>
+                <button onclick="sendCommand('reset')" class="btn-red" style="margin-top: 1rem;">RESET ALL</button>
+            </div>
 
-<body style="background:black;color:white;text-align:center;font-family:Arial;">
+            <div class="stat-card">
+                <h3>Live Status</h3>
+                <p>Submissions: <span id="subCount" style="color: var(--primary-color); font-size: 2rem; font-weight: 800;">0</span></p>
+                <p>Status: <span id="statusText" style="color: var(--secondary-color);">Lobby</span></p>
+                <div id="recentLog" style="font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </div>
 
-<h1>Admin Dashboard</h1>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        
+        function sendCommand(cmd) {
+            const mode = document.getElementById('modeSelect').value;
+            socket.emit('admin_command', { command: cmd, mode: mode });
+        }
 
-<h2 id="count">0</h2>
-<div id="message"></div>
-
-<h2>Controls</h2>
-<button onclick="send('audio','audio.html')">Audio</button>
-<button onclick="send('visual','visual.html')">Visual</button>
-<button onclick="send('all','both.html')">All</button>
-
-<h2>Users</h2>
-
-<div style="display:flex;justify-content:center;gap:40px;">
-<div><h3>Audio</h3><div id="audioUsers"></div></div>
-<div><h3>Visual</h3><div id="visualUsers"></div></div>
-<div><h3>Both</h3><div id="bothUsers"></div></div>
-</div>
-
-<h2>Submissions</h2>
-<div id="subs"></div>
-
-<script>
-const socket = io();
-
-function send(group,page){
-    socket.emit("force_redirect",{group,page});
-}
-
-socket.on("aggregator_update",d=>{
-    count.textContent = d.count;
-    message.textContent = d.message;
-});
-
-socket.on("new_submission", d => {
-    const div = document.createElement("div");
-
-    // --- Instruments (audio JSON parsing) ---
-    let instrumentsText = "";
-    try {
-        const parsed = JSON.parse(d.instruments);
-
-        instrumentsText = Object.entries(parsed).map(([instrument, data]) => {
-            const effects = data.effects.length
-                ? ` (Effects: ${data.effects.join(", ")})`
-                : "";
-            return `${instrument}${effects}`;
-        }).join(" | ");
-
-    } catch (e) {
-        instrumentsText = d.instruments;
-    }
-
-    // --- Dancers + Models (NEW) ---
-    const dancerText = `
-        D1: ${d.dancer1_dance || "-"} / ${d.dancer1_model || "-"}
-        | D2: ${d.dancer2_dance || "-"} / ${d.dancer2_model || "-"}
-    `;
-
-    // --- Performer Skins (NEW) ---
-    const performerText = `
-        Dr1: ${d.drummer1 || "-"},
-        Dr2: ${d.drummer2 || "-"},
-        G: ${d.guitar_skin || "-"},
-        B: ${d.bass_skin || "-"},
-        P: ${d.piano_skin || "-"},
-        S: ${d.strings_skin || "-"}
-    `;
-
-    // --- Final Output ---
-    div.textContent =
-        `${d.username} | ${d.genre} | ${d.tempo || "-"} BPM | ` +
-        `${instrumentsText} | ${d.color || "-"} | ` +
-        `${dancerText} | ${performerText}`;
-
-    subs.prepend(div);
-});
-
-socket.on("user_list_update",g=>{
-    render("audioUsers",g.audio,"audio");
-    render("visualUsers",g.visual,"visual");
-    render("bothUsers",g.both,"both");
-});
-
-function render(id,users,current){
-    const el=document.getElementById(id);
-    el.innerHTML="";
-    users.forEach(u=>{
-        const d=document.createElement("div");
-        d.textContent=u.username+" ";
-
-        ["audio","visual","both"].forEach(g=>{
-            if(g!==current){
-                const b=document.createElement("button");
-                b.textContent=g;
-                b.onclick=()=>socket.emit("move_user",{socketId:u.socketId,newGroup:g});
-                d.appendChild(b);
-            }
+        socket.on("aggregator_update", data => {
+            document.getElementById('subCount').textContent = data.count;
+            const log = document.getElementById('recentLog');
+            log.innerHTML = `<div>${data.recentUser} joined</div>` + log.innerHTML;
         });
 
-        el.appendChild(d);
-    });
-}
-</script>
-
+        socket.on("phase_change", state => {
+            document.getElementById('statusText').textContent = state.phase.toUpperCase();
+        });
+    </script>
 </body>
 </html>

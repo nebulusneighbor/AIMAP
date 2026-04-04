@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AIMAP - Lobby</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="dots"></div>
+    <div class="login-container">
+        <h1>Welcome to AIMAP</h1>
+        <p style="color: rgba(255,255,255,0.6); margin-bottom: 2rem;">
+            You are connected. Please wait for the admin to start the session...
+        </p>
+        <div class="loader" style="border: 4px solid var(--primary-color); border-top: 4px solid transparent; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: auto;"></div>
+    </div>
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.on("redirect_clients", d => window.location.href = d.page);
+    </script>
+</body>
+</html>
