@@ -7,7 +7,7 @@ namespace AIMAP.Diagnostics
     {
         [SerializeField] private OSCTransmitter oscTransmitter;
         [SerializeField] private string targetHost = "127.0.0.1";
-        [SerializeField] private int targetPort = 9000;
+        [SerializeField] private int targetPort = 11003;
         [SerializeField] private string[] roleIds =
         {
             "dancer1",
@@ -22,7 +22,7 @@ namespace AIMAP.Diagnostics
         private int _nextSkinIndex;
         private int _skyboxIndex;
         private string _lastSentAddress = "None";
-        private string _lastTarget = "127.0.0.1:9000";
+        private string _lastTarget = "127.0.0.1:11003";
 
         public void Configure(OSCTransmitter transmitter)
         {

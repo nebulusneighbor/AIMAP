@@ -445,6 +445,7 @@ GameObject:
   m_Component:
   - component: {fileID: 627940667}
   - component: {fileID: 627940666}
+  - component: {fileID: 627940668}
   - component: {fileID: 627940665}
   - component: {fileID: 627940664}
   - component: {fileID: 627940663}
@@ -471,7 +472,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Diagnostics.AimapOscTestConsole
   oscTransmitter: {fileID: 627940662}
   targetHost: 127.0.0.1
-  targetPort: 9000
+  targetPort: 11003
   roleIds:
   - dancer1
   - dancer2
@@ -502,7 +503,7 @@ MonoBehaviour:
   _localHost: 192.168.0.201
   _localPort: 7000
   _remoteHost: 127.0.0.1
-  _remotePort: 9000
+  _remotePort: 11003
   _useBundle: 0
 --- !u!114 &627940663
 MonoBehaviour:
@@ -516,7 +517,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfbb7e6029cdc4f4a8ef89b896924b5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Osc.AimapOscRouter
-  oscReceiver: {fileID: 0}
+  oscReceivers: []
   avatarSlots: []
   environmentController: {fileID: 0}
   diagnostics: {fileID: 0}
@@ -575,7 +576,26 @@ MonoBehaviour:
   _workInEditor: 0
   _localHostMode: 0
   _localHost: 192.168.0.201
-  _localPort: 9000
+  _localPort: 11003
+--- !u!114 &627940668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627940660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbba286dc10e549b2bdec947ef8dbd3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: extOSC::extOSC.OSCReceiver
+  _autoConnect: 1
+  _closeOnPause: 0
+  _mapBundle: {fileID: 0}
+  _workInEditor: 0
+  _localHostMode: 0
+  _localHost: 192.168.0.201
+  _localPort: 2348
 --- !u!4 &627940667
 Transform:
   m_ObjectHideFlags: 0

@@ -9,16 +9,16 @@ namespace AIMAP.Osc
 {
     public sealed class AimapOscRouter : MonoBehaviour
     {
-        [SerializeField] private OSCReceiver oscReceiver;
+        [SerializeField] private OSCReceiver[] oscReceivers;
         [SerializeField] private AvatarSlotController[] avatarSlots;
         [SerializeField] private SkyboxEnvironmentController environmentController;
         [SerializeField] private AimapOscDiagnostics diagnostics;
 
         private void Awake()
         {
-            if (oscReceiver == null)
+            if (oscReceivers == null || oscReceivers.Length == 0)
             {
-                oscReceiver = GetComponent<OSCReceiver>();
+                oscReceivers = GetComponents<OSCReceiver>();
             }
 
             if (environmentController == null)
@@ -44,35 +44,52 @@ namespace AIMAP.Osc
 
         private void OnDisable()
         {
-            if (oscReceiver != null)
+            if (oscReceivers == null)
             {
-                oscReceiver.ClearBinds();
+                return;
+            }
+
+            for (var i = 0; i < oscReceivers.Length; i++)
+            {
+                oscReceivers[i]?.ClearBinds();
             }
         }
 
         private void BindAddresses()
         {
-            if (oscReceiver == null)
+            if (oscReceivers == null || oscReceivers.Length == 0)
             {
                 return;
             }
 
-            oscReceiver.ClearBinds();
-
-            for (var index = 0; index < avatarSlots.Length; index++)
+            for (var r = 0; r < oscReceivers.Length; r++)
             {
-                var slot = avatarSlots[index];
-                if (slot == null || string.IsNullOrWhiteSpace(slot.RoleId))
+                var receiver = oscReceivers[r];
+                if (receiver == null)
                 {
                     continue;
                 }
 
-                var roleId = slot.RoleId;
-                oscReceiver.Bind($"/avatar/{roleId}/state", message => HandleAvatarState(roleId, message));
-                oscReceiver.Bind($"/avatar/{roleId}/skin", message => HandleAvatarSkin(roleId, message));
-            }
+                receiver.ClearBinds();
 
-            oscReceiver.Bind("/environment/skybox", HandleEnvironmentSkybox);
+                if (avatarSlots != null)
+                {
+                    for (var index = 0; index < avatarSlots.Length; index++)
+                    {
+                        var slot = avatarSlots[index];
+                        if (slot == null || string.IsNullOrWhiteSpace(slot.RoleId))
+                        {
+                            continue;
+                        }
+
+                        var roleId = slot.RoleId;
+                        receiver.Bind($"/avatar/{roleId}/state", message => HandleAvatarState(roleId, message));
+                        receiver.Bind($"/avatar/{roleId}/skin", message => HandleAvatarSkin(roleId, message));
+                    }
+                }
+
+                receiver.Bind("/environment/skybox", HandleEnvironmentSkybox);
+            }
         }
 
         private void HandleAvatarState(string roleId, OSCMessage message)

@@ -15,7 +15,8 @@ namespace AIMAP.Editor
     {
         private const string MainScenePath = "Assets/Scenes/AIMAPVR.unity";
         private const string TestScenePath = "Assets/Scenes/AIMAPVR_OscTest.unity";
-        private const int OscListenPort = 9000;
+        private const int WebOscPort = 11003;
+        private const int AbletonOscPort = 2348;
 
         private static readonly RoleConfig[] RoleConfigs =
         {
@@ -107,8 +108,11 @@ namespace AIMAP.Editor
             var manager = new GameObject("AIMAP OSC Manager");
             SceneManager.MoveGameObjectToScene(manager, scene);
 
-            var receiver = manager.AddComponent<OSCReceiver>();
-            receiver.LocalPort = OscListenPort;
+            var receiverWeb = manager.AddComponent<OSCReceiver>();
+            receiverWeb.LocalPort = WebOscPort;
+
+            var receiverAbleton = manager.AddComponent<OSCReceiver>();
+            receiverAbleton.LocalPort = AbletonOscPort;
 
             var diagnostics = manager.AddComponent<AimapOscDiagnostics>();
             diagnostics.Configure(true);
@@ -122,7 +126,7 @@ namespace AIMAP.Editor
             {
                 var transmitter = manager.AddComponent<OSCTransmitter>();
                 transmitter.RemoteHost = "127.0.0.1";
-                transmitter.RemotePort = OscListenPort;
+                transmitter.RemotePort = WebOscPort;
 
                 var testConsole = manager.AddComponent<AimapOscTestConsole>();
                 testConsole.Configure(transmitter);
