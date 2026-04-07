@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &80754284
+--- !u!1 &97302458
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,122 +127,52 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 80754285}
-  - component: {fileID: 80754286}
+  - component: {fileID: 97302459}
+  - component: {fileID: 97302460}
   m_Layer: 0
-  m_Name: dancer1_Slot
+  m_Name: drum2_Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &80754285
+--- !u!4 &97302459
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 80754284}
+  m_GameObject: {fileID: 97302458}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6, y: 0, z: 3}
+  m_LocalPosition: {x: 4, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1839113050}
+  m_Father: {fileID: 627940667}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &80754286
+--- !u!114 &97302460
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 80754284}
+  m_GameObject: {fileID: 97302458}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
-  roleId: dancer1
+  roleId: drum2
   targetAvatarName: 
-  roleController: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-  idleStateName: listen2
-  activeStateName: hippop
-  fallbackPrefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-  skinVariants:
-  - familyIndex: 0
-    displayName: ybotT-Pose
-    prefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 0
-    displayName: xbotT-Pose
-    prefab: {fileID: 919132149155446097, guid: cec365a1270d04beb9cb57b37cf57373, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: AlienT-Pose
-    prefab: {fileID: 919132149155446097, guid: d281b06de8591406d866d3ac22d998d2, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: MaynardT-Pose
-    prefab: {fileID: 919132149155446097, guid: d28aa48e06f164e548af01f9ec9449e0, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: jonesT-Pose
-    prefab: {fileID: 919132149155446097, guid: b99edaad2d4f347f190cd49623c7e675, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: zlorpT-Pose
-    prefab: {fileID: 919132149155446097, guid: 26d7f090ab8154ae5ba51f64bcb180bd, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: GoblinT-Pose
-    prefab: {fileID: 919132149155446097, guid: 31e761e9524504ff3b9c5ee37b3e7da7, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: MawT-Pose
-    prefab: {fileID: 919132149155446097, guid: 72b75f89025184474b77fd8a883d8c3a, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: VampireT-Pose
-    prefab: {fileID: 919132149155446097, guid: 4fe21cb76220e44c3b730b2e2518d633, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: WarrockT-Pose
-    prefab: {fileID: 919132149155446097, guid: 91e84140fe476418ea653d9ca4e32bce, type: 3}
-    controllerOverride: {fileID: 9100000, guid: f1b45951bc798468980a744008c6b015, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+  roleController: {fileID: 0}
+  idleStateName: sit2
+  activeStateName: drum2
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
---- !u!1 &684409340
+--- !u!1 &289521662
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -250,122 +180,112 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 684409341}
-  - component: {fileID: 684409342}
+  - component: {fileID: 289521666}
+  - component: {fileID: 289521665}
+  - component: {fileID: 289521664}
+  - component: {fileID: 289521663}
   m_Layer: 0
-  m_Name: dancer2_Slot
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &684409341
+--- !u!23 &289521663
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289521662}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &289521664
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289521662}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!33 &289521665
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289521662}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &289521666
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 684409340}
+  m_GameObject: {fileID: 289521662}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: 0, z: 3}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1839113050}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &684409342
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 684409340}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
-  roleId: dancer2
-  targetAvatarName: 
-  roleController: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-  idleStateName: listen2
-  activeStateName: salsa
-  fallbackPrefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-  skinVariants:
-  - familyIndex: 0
-    displayName: ybotT-Pose
-    prefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 0
-    displayName: xbotT-Pose
-    prefab: {fileID: 919132149155446097, guid: cec365a1270d04beb9cb57b37cf57373, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: AlienT-Pose
-    prefab: {fileID: 919132149155446097, guid: d281b06de8591406d866d3ac22d998d2, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: MaynardT-Pose
-    prefab: {fileID: 919132149155446097, guid: d28aa48e06f164e548af01f9ec9449e0, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: jonesT-Pose
-    prefab: {fileID: 919132149155446097, guid: b99edaad2d4f347f190cd49623c7e675, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: zlorpT-Pose
-    prefab: {fileID: 919132149155446097, guid: 26d7f090ab8154ae5ba51f64bcb180bd, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: GoblinT-Pose
-    prefab: {fileID: 919132149155446097, guid: 31e761e9524504ff3b9c5ee37b3e7da7, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: MawT-Pose
-    prefab: {fileID: 919132149155446097, guid: 72b75f89025184474b77fd8a883d8c3a, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: VampireT-Pose
-    prefab: {fileID: 919132149155446097, guid: 4fe21cb76220e44c3b730b2e2518d633, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: WarrockT-Pose
-    prefab: {fileID: 919132149155446097, guid: 91e84140fe476418ea653d9ca4e32bce, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 34af7bb361e0442b49d35ec671851b50, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  bindOnStart: 1
-  defaultFamilyIndex: 0
---- !u!1 &855072135
+--- !u!1 &382729932
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -373,9 +293,61 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 855072137}
-  - component: {fileID: 855072136}
-  - component: {fileID: 855072138}
+  - component: {fileID: 382729933}
+  - component: {fileID: 382729934}
+  m_Layer: 0
+  m_Name: violin_Slot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &382729933
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382729932}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 627940667}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &382729934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382729932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
+  roleId: violin
+  targetAvatarName: 
+  roleController: {fileID: 0}
+  idleStateName: listen
+  activeStateName: violin
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
+  bindOnStart: 1
+  defaultFamilyIndex: 0
+--- !u!1 &500378399
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 500378401}
+  - component: {fileID: 500378400}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -383,13 +355,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!108 &855072136
+--- !u!108 &500378400
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 855072135}
+  m_GameObject: {fileID: 500378399}
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 1
@@ -448,13 +420,13 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!4 &855072137
+--- !u!4 &500378401
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 855072135}
+  m_GameObject: {fileID: 500378399}
   serializedVersion: 2
   m_LocalRotation: {x: 0.40821794, y: -0.23456973, z: 0.10938166, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -463,36 +435,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &855072138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 855072135}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
-  m_UsePipelineSettings: 1
-  m_AdditionalLightsShadowResolutionTier: 2
-  m_CustomShadowLayers: 0
-  m_LightCookieSize: {x: 1, y: 1}
-  m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 0
-  m_RenderingLayersMask:
-    serializedVersion: 0
-    m_Bits: 1
-  m_ShadowRenderingLayersMask:
-    serializedVersion: 0
-    m_Bits: 1
-  m_Version: 4
-  m_LightLayerMask: 1
-  m_ShadowLayerMask: 1
-  m_RenderingLayers: 1
-  m_ShadowRenderingLayers: 1
---- !u!1 &1086406276
+--- !u!1 &627940660
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -500,9 +443,277 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1086406278}
-  - component: {fileID: 1086406277}
-  - component: {fileID: 1086406279}
+  - component: {fileID: 627940667}
+  - component: {fileID: 627940666}
+  - component: {fileID: 627940665}
+  - component: {fileID: 627940664}
+  - component: {fileID: 627940663}
+  - component: {fileID: 627940662}
+  - component: {fileID: 627940661}
+  m_Layer: 0
+  m_Name: AIMAP OSC Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &627940661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627940660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 352fb753b38524e11b4de2205eb18371, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Diagnostics.AimapOscTestConsole
+  oscTransmitter: {fileID: 627940662}
+  targetHost: 127.0.0.1
+  targetPort: 9000
+  roleIds:
+  - dancer1
+  - dancer2
+  - drum1
+  - drum2
+  - bass
+  - guitar
+  - violin
+--- !u!114 &627940662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627940660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 464088183d2a1484ab8fb64e356c9f5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: extOSC::extOSC.OSCTransmitter
+  _autoConnect: 1
+  _closeOnPause: 0
+  _mapBundle: {fileID: 0}
+  _workInEditor: 0
+  _localHostMode: 0
+  _localPortMode: 2
+  _localReceiver: {fileID: 0}
+  _localHost: 192.168.0.201
+  _localPort: 7000
+  _remoteHost: 127.0.0.1
+  _remotePort: 9000
+  _useBundle: 0
+--- !u!114 &627940663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627940660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfbb7e6029cdc4f4a8ef89b896924b5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Osc.AimapOscRouter
+  oscReceiver: {fileID: 0}
+  avatarSlots: []
+  environmentController: {fileID: 0}
+  diagnostics: {fileID: 0}
+--- !u!114 &627940664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627940660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b704218cbf454e39b69c39c17442a6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Environment.SkyboxEnvironmentController
+  skyboxMaterials:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  defaultSkyboxIndex: 0
+  applyOnStart: 1
+  trainingStageSkyboxIndex: 0
+  trainingStageGlowObject: {fileID: 0}
+  trainingStageGlowObjectName: PolygonGrid_Glow
+--- !u!114 &627940665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627940660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3669a76385b0c4f748d3882efd448bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Diagnostics.AimapOscDiagnostics
+  showOverlay: 1
+  lastAddress: None
+  lastRole: None
+  currentSkyboxIndex: 0
+--- !u!114 &627940666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627940660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbba286dc10e549b2bdec947ef8dbd3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: extOSC::extOSC.OSCReceiver
+  _autoConnect: 1
+  _closeOnPause: 0
+  _mapBundle: {fileID: 0}
+  _workInEditor: 0
+  _localHostMode: 0
+  _localHost: 192.168.0.201
+  _localPort: 9000
+--- !u!4 &627940667
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627940660}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1901115146}
+  - {fileID: 900499089}
+  - {fileID: 1822167122}
+  - {fileID: 97302459}
+  - {fileID: 1283528484}
+  - {fileID: 1056764577}
+  - {fileID: 382729933}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &900499088
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 900499089}
+  - component: {fileID: 900499090}
+  m_Layer: 0
+  m_Name: dancer2_Slot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &900499089
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900499088}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6, y: 0, z: 3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 627940667}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &900499090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900499088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
+  roleId: dancer2
+  targetAvatarName: 
+  roleController: {fileID: 0}
+  idleStateName: listen2
+  activeStateName: salsa
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
+  bindOnStart: 1
+  defaultFamilyIndex: 0
+--- !u!1 &1056764576
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1056764577}
+  - component: {fileID: 1056764578}
+  m_Layer: 0
+  m_Name: guitar_Slot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1056764577
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056764576}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2, y: 0, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 627940667}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1056764578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056764576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
+  roleId: guitar
+  targetAvatarName: 
+  roleController: {fileID: 0}
+  idleStateName: listen
+  activeStateName: Guitarplay1
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
+  bindOnStart: 1
+  defaultFamilyIndex: 0
+--- !u!1 &1276818995
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1276818997}
+  - component: {fileID: 1276818996}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -510,13 +721,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!20 &1086406277
+--- !u!20 &1276818996
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1086406276}
+  m_GameObject: {fileID: 1276818995}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
@@ -561,13 +772,13 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!4 &1086406278
+--- !u!4 &1276818997
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1086406276}
+  m_GameObject: {fileID: 1276818995}
   serializedVersion: 2
   m_LocalRotation: {x: 0.15643448, y: 0, z: 0, w: 0.98768836}
   m_LocalPosition: {x: 0, y: 6, z: -12}
@@ -576,51 +787,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1086406279
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1086406276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
-  m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 0
-  m_Cameras: []
-  m_RendererIndex: -1
-  m_VolumeLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
-  m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
-  m_Antialiasing: 0
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
-  m_Dithering: 0
-  m_ClearDepth: 1
-  m_AllowXRRendering: 1
-  m_AllowHDROutput: 1
-  m_UseScreenCoordOverride: 0
-  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
-  m_RequiresDepthTexture: 0
-  m_RequiresColorTexture: 0
-  m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
-    m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
-  m_Version: 2
---- !u!1 &1230360224
+--- !u!1 &1283528483
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -628,490 +795,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1230360225}
-  - component: {fileID: 1230360226}
-  m_Layer: 0
-  m_Name: drum1_Slot
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1230360225
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1230360224}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4, y: 0, z: -1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1839113050}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1230360226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1230360224}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
-  roleId: drum1
-  targetAvatarName: 
-  roleController: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-  idleStateName: sit1
-  activeStateName: drum1
-  fallbackPrefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-  skinVariants:
-  - familyIndex: 0
-    displayName: ybotT-Pose
-    prefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 0
-    displayName: xbotT-Pose
-    prefab: {fileID: 919132149155446097, guid: cec365a1270d04beb9cb57b37cf57373, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: AlienT-Pose
-    prefab: {fileID: 919132149155446097, guid: d281b06de8591406d866d3ac22d998d2, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: MaynardT-Pose
-    prefab: {fileID: 919132149155446097, guid: d28aa48e06f164e548af01f9ec9449e0, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: jonesT-Pose
-    prefab: {fileID: 919132149155446097, guid: b99edaad2d4f347f190cd49623c7e675, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: zlorpT-Pose
-    prefab: {fileID: 919132149155446097, guid: 26d7f090ab8154ae5ba51f64bcb180bd, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: GoblinT-Pose
-    prefab: {fileID: 919132149155446097, guid: 31e761e9524504ff3b9c5ee37b3e7da7, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: MawT-Pose
-    prefab: {fileID: 919132149155446097, guid: 72b75f89025184474b77fd8a883d8c3a, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: VampireT-Pose
-    prefab: {fileID: 919132149155446097, guid: 4fe21cb76220e44c3b730b2e2518d633, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: WarrockT-Pose
-    prefab: {fileID: 919132149155446097, guid: 91e84140fe476418ea653d9ca4e32bce, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 5597fa3fed9574ca0b6b2e3a34a18b61, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  bindOnStart: 1
-  defaultFamilyIndex: 0
---- !u!1 &1437645151
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1437645155}
-  - component: {fileID: 1437645154}
-  - component: {fileID: 1437645153}
-  - component: {fileID: 1437645152}
-  m_Layer: 0
-  m_Name: Floor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!23 &1437645152
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1437645151}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1437645153
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1437645151}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!33 &1437645154
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1437645151}
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &1437645155
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1437645151}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1566418848
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1566418849}
-  - component: {fileID: 1566418850}
-  m_Layer: 0
-  m_Name: violin_Slot
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1566418849
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1566418848}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 4}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1839113050}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1566418850
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1566418848}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
-  roleId: violin
-  targetAvatarName: 
-  roleController: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-  idleStateName: listen
-  activeStateName: violin
-  fallbackPrefab: {fileID: 919132149155446097, guid: cec365a1270d04beb9cb57b37cf57373, type: 3}
-  skinVariants:
-  - familyIndex: 0
-    displayName: ybotT-Pose
-    prefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 0
-    displayName: xbotT-Pose
-    prefab: {fileID: 919132149155446097, guid: cec365a1270d04beb9cb57b37cf57373, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: AlienT-Pose
-    prefab: {fileID: 919132149155446097, guid: d281b06de8591406d866d3ac22d998d2, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: MaynardT-Pose
-    prefab: {fileID: 919132149155446097, guid: d28aa48e06f164e548af01f9ec9449e0, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: jonesT-Pose
-    prefab: {fileID: 919132149155446097, guid: b99edaad2d4f347f190cd49623c7e675, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: zlorpT-Pose
-    prefab: {fileID: 919132149155446097, guid: 26d7f090ab8154ae5ba51f64bcb180bd, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: GoblinT-Pose
-    prefab: {fileID: 919132149155446097, guid: 31e761e9524504ff3b9c5ee37b3e7da7, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: MawT-Pose
-    prefab: {fileID: 919132149155446097, guid: 72b75f89025184474b77fd8a883d8c3a, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: VampireT-Pose
-    prefab: {fileID: 919132149155446097, guid: 4fe21cb76220e44c3b730b2e2518d633, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: WarrockT-Pose
-    prefab: {fileID: 919132149155446097, guid: 91e84140fe476418ea653d9ca4e32bce, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 9b691cf1b43f44978aef5913f8b888e6, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  bindOnStart: 1
-  defaultFamilyIndex: 0
---- !u!1 &1568117023
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1568117024}
-  - component: {fileID: 1568117025}
-  m_Layer: 0
-  m_Name: guitar_Slot
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1568117024
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1568117023}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 0, z: 1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1839113050}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1568117025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1568117023}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
-  roleId: guitar
-  targetAvatarName: 
-  roleController: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-  idleStateName: listen
-  activeStateName: Guitarplay1
-  fallbackPrefab: {fileID: 919132149155446097, guid: cec365a1270d04beb9cb57b37cf57373, type: 3}
-  skinVariants:
-  - familyIndex: 0
-    displayName: ybotT-Pose
-    prefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 0
-    displayName: xbotT-Pose
-    prefab: {fileID: 919132149155446097, guid: cec365a1270d04beb9cb57b37cf57373, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: AlienT-Pose
-    prefab: {fileID: 919132149155446097, guid: d281b06de8591406d866d3ac22d998d2, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: MaynardT-Pose
-    prefab: {fileID: 919132149155446097, guid: d28aa48e06f164e548af01f9ec9449e0, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: jonesT-Pose
-    prefab: {fileID: 919132149155446097, guid: b99edaad2d4f347f190cd49623c7e675, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: zlorpT-Pose
-    prefab: {fileID: 919132149155446097, guid: 26d7f090ab8154ae5ba51f64bcb180bd, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: GoblinT-Pose
-    prefab: {fileID: 919132149155446097, guid: 31e761e9524504ff3b9c5ee37b3e7da7, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: MawT-Pose
-    prefab: {fileID: 919132149155446097, guid: 72b75f89025184474b77fd8a883d8c3a, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: VampireT-Pose
-    prefab: {fileID: 919132149155446097, guid: 4fe21cb76220e44c3b730b2e2518d633, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: WarrockT-Pose
-    prefab: {fileID: 919132149155446097, guid: 91e84140fe476418ea653d9ca4e32bce, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  bindOnStart: 1
-  defaultFamilyIndex: 0
---- !u!1 &1637463516
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1637463517}
-  - component: {fileID: 1637463518}
+  - component: {fileID: 1283528484}
+  - component: {fileID: 1283528485}
   m_Layer: 0
   m_Name: bass_Slot
   m_TagString: Untagged
@@ -1119,28 +804,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1637463517
+--- !u!4 &1283528484
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1637463516}
+  m_GameObject: {fileID: 1283528483}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2, y: 0, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1839113050}
+  m_Father: {fileID: 627940667}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1637463518
+--- !u!114 &1283528485
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1637463516}
+  m_GameObject: {fileID: 1283528483}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
@@ -1148,84 +833,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
   roleId: bass
   targetAvatarName: 
-  roleController: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
+  roleController: {fileID: 0}
   idleStateName: listen2
   activeStateName: guitarPlaying2
-  fallbackPrefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-  skinVariants:
-  - familyIndex: 0
-    displayName: ybotT-Pose
-    prefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 0
-    displayName: xbotT-Pose
-    prefab: {fileID: 919132149155446097, guid: cec365a1270d04beb9cb57b37cf57373, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: AlienT-Pose
-    prefab: {fileID: 919132149155446097, guid: d281b06de8591406d866d3ac22d998d2, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: MaynardT-Pose
-    prefab: {fileID: 919132149155446097, guid: d28aa48e06f164e548af01f9ec9449e0, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: jonesT-Pose
-    prefab: {fileID: 919132149155446097, guid: b99edaad2d4f347f190cd49623c7e675, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: zlorpT-Pose
-    prefab: {fileID: 919132149155446097, guid: 26d7f090ab8154ae5ba51f64bcb180bd, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: GoblinT-Pose
-    prefab: {fileID: 919132149155446097, guid: 31e761e9524504ff3b9c5ee37b3e7da7, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: MawT-Pose
-    prefab: {fileID: 919132149155446097, guid: 72b75f89025184474b77fd8a883d8c3a, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: VampireT-Pose
-    prefab: {fileID: 919132149155446097, guid: 4fe21cb76220e44c3b730b2e2518d633, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: WarrockT-Pose
-    prefab: {fileID: 919132149155446097, guid: 91e84140fe476418ea653d9ca4e32bce, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 4b0c79de52f2d4e6f943f3af4c551fbd, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
---- !u!1 &1839113043
+--- !u!1 &1822167121
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1233,286 +848,109 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1839113050}
-  - component: {fileID: 1839113049}
-  - component: {fileID: 1839113048}
-  - component: {fileID: 1839113047}
-  - component: {fileID: 1839113046}
-  - component: {fileID: 1839113045}
-  - component: {fileID: 1839113044}
+  - component: {fileID: 1822167122}
+  - component: {fileID: 1822167123}
   m_Layer: 0
-  m_Name: AIMAP OSC Manager
+  m_Name: drum1_Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1839113044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839113043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 352fb753b38524e11b4de2205eb18371, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Diagnostics.AimapOscTestConsole
-  oscTransmitter: {fileID: 1839113045}
-  targetHost: 127.0.0.1
-  targetPort: 9000
-  roleIds:
-  - dancer1
-  - dancer2
-  - drum1
-  - drum2
-  - bass
-  - guitar
-  - violin
---- !u!114 &1839113045
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839113043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 464088183d2a1484ab8fb64e356c9f5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: extOSC::extOSC.OSCTransmitter
-  _autoConnect: 1
-  _closeOnPause: 0
-  _mapBundle: {fileID: 0}
-  _workInEditor: 0
-  _localHostMode: 0
-  _localPortMode: 2
-  _localReceiver: {fileID: 0}
-  _localHost: 127.0.0.1
-  _localPort: 7000
-  _remoteHost: 10.0.0.124
-  _remotePort: 9000
-  _useBundle: 0
---- !u!114 &1839113046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839113043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfbb7e6029cdc4f4a8ef89b896924b5b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Osc.AimapOscRouter
-  oscReceiver: {fileID: 0}
-  avatarSlots: []
-  environmentController: {fileID: 0}
-  diagnostics: {fileID: 0}
---- !u!114 &1839113047
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839113043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b704218cbf454e39b69c39c17442a6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Environment.SkyboxEnvironmentController
-  skyboxMaterials:
-  - {fileID: 2100000, guid: 9edf804537de74d729fdc6a21dc2cd6f, type: 2}
-  - {fileID: 2100000, guid: 694d78a1bf1f643979d7a8cfc976ec09, type: 2}
-  - {fileID: 2100000, guid: 77a3624cb06bf4decaa1f08a5252eba0, type: 2}
-  defaultSkyboxIndex: 0
-  applyOnStart: 1
---- !u!114 &1839113048
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839113043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3669a76385b0c4f748d3882efd448bc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Diagnostics.AimapOscDiagnostics
-  showOverlay: 1
-  lastAddress: None
-  lastRole: None
-  currentSkyboxIndex: 0
---- !u!114 &1839113049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839113043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbba286dc10e549b2bdec947ef8dbd3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: extOSC::extOSC.OSCReceiver
-  _autoConnect: 1
-  _closeOnPause: 0
-  _mapBundle: {fileID: 0}
-  _workInEditor: 0
-  _localHostMode: 0
-  _localHost: 127.0.0.1
-  _localPort: 9000
---- !u!4 &1839113050
+--- !u!4 &1822167122
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839113043}
+  m_GameObject: {fileID: 1822167121}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 80754285}
-  - {fileID: 684409341}
-  - {fileID: 1230360225}
-  - {fileID: 2030376584}
-  - {fileID: 1637463517}
-  - {fileID: 1568117024}
-  - {fileID: 1566418849}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2030376583
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2030376584}
-  - component: {fileID: 2030376585}
-  m_Layer: 0
-  m_Name: drum2_Slot
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2030376584
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2030376583}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 0, z: -1}
+  m_LocalPosition: {x: -4, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1839113050}
+  m_Father: {fileID: 627940667}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2030376585
+--- !u!114 &1822167123
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2030376583}
+  m_GameObject: {fileID: 1822167121}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
-  roleId: drum2
+  roleId: drum1
   targetAvatarName: 
-  roleController: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-  idleStateName: sit2
-  activeStateName: drum2
-  fallbackPrefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-  skinVariants:
-  - familyIndex: 0
-    displayName: ybotT-Pose
-    prefab: {fileID: 919132149155446097, guid: ca0d38c8444ea4f828e3e08fb8c45128, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 0
-    displayName: xbotT-Pose
-    prefab: {fileID: 919132149155446097, guid: cec365a1270d04beb9cb57b37cf57373, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: AlienT-Pose
-    prefab: {fileID: 919132149155446097, guid: d281b06de8591406d866d3ac22d998d2, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: MaynardT-Pose
-    prefab: {fileID: 919132149155446097, guid: d28aa48e06f164e548af01f9ec9449e0, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: jonesT-Pose
-    prefab: {fileID: 919132149155446097, guid: b99edaad2d4f347f190cd49623c7e675, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 1
-    displayName: zlorpT-Pose
-    prefab: {fileID: 919132149155446097, guid: 26d7f090ab8154ae5ba51f64bcb180bd, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: GoblinT-Pose
-    prefab: {fileID: 919132149155446097, guid: 31e761e9524504ff3b9c5ee37b3e7da7, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: MawT-Pose
-    prefab: {fileID: 919132149155446097, guid: 72b75f89025184474b77fd8a883d8c3a, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: VampireT-Pose
-    prefab: {fileID: 919132149155446097, guid: 4fe21cb76220e44c3b730b2e2518d633, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-  - familyIndex: 2
-    displayName: WarrockT-Pose
-    prefab: {fileID: 919132149155446097, guid: 91e84140fe476418ea653d9ca4e32bce, type: 3}
-    controllerOverride: {fileID: 9100000, guid: 06100caddadf646e584d1fa7ac448a34, type: 2}
-    localPositionOffset: {x: 0, y: 0, z: 0}
-    localRotationOffset: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+  roleController: {fileID: 0}
+  idleStateName: sit1
+  activeStateName: drum1
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
+  bindOnStart: 1
+  defaultFamilyIndex: 0
+--- !u!1 &1901115145
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1901115146}
+  - component: {fileID: 1901115147}
+  m_Layer: 0
+  m_Name: dancer1_Slot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1901115146
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901115145}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6, y: 0, z: 3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 627940667}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1901115147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901115145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
+  roleId: dancer1
+  targetAvatarName: 
+  roleController: {fileID: 0}
+  idleStateName: listen2
+  activeStateName: hippop
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1086406278}
-  - {fileID: 855072137}
-  - {fileID: 1437645155}
-  - {fileID: 1839113050}
+  - {fileID: 1276818997}
+  - {fileID: 500378401}
+  - {fileID: 289521666}
+  - {fileID: 627940667}

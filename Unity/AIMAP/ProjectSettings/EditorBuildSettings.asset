@@ -5,12 +5,15 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/AIMAPVR.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/AIMAPVR_OscTest.unity
     guid: 3c6205b1e8c949c0a7a0be8d0e187001
+  - enabled: 1
+    path: Assets/Scenes/animationtest.unity
+    guid: 9295e09bb08b00848909e96f8406006d
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 3537337eb4dac194b9a91855cbbbec0c, type: 2}
