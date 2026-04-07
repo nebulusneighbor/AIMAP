@@ -6,18 +6,27 @@
     <link rel="stylesheet" href="/style.css">
     <style>
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; text-align: left; }
-        .stat-card { background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 16px; }
+        .stat-card { background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
         .btn-red { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); color: white; }
+        .btn-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .btn-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+        .ip-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--primary-color); padding: 5px 10px; border-radius: 5px; font-family: monospace; font-size: 0.8rem; margin-bottom: 5px; width: 120px; }
     </style>
 </head>
 <body>
     <div class="dots"></div>
-    <div class="login-container" style="max-width: 800px;">
+    <div class="login-container" style="max-width: 900px;">
         <h1>AIMAP ADMIN</h1>
         
         <div class="admin-grid">
             <div class="stat-card">
                 <h3>Control Phase</h3>
+                <label>Target IP Addresses</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                    <div><span style="font-size:0.6rem; display:block">ABLETON IP</span><input type="text" id="abletonIP" class="ip-input" value="127.0.0.1"></div>
+                    <div><span style="font-size:0.6rem; display:block">UNITY IP</span><input type="text" id="unityIP" class="ip-input" value="127.0.0.1"></div>
+                </div>
+
                 <label>Select Session Mode</label>
                 <select id="modeSelect">
                     <option value="audio">Audio Parameters</option>
@@ -26,14 +35,17 @@
                 </select>
                 <button onclick="sendCommand('start_vote')" style="margin-top: 1rem;">START SESSION</button>
                 <button onclick="sendCommand('lock_and_average')" style="margin-top: 1rem; background: var(--secondary-color);">LOCK & SHOW RESULTS</button>
-                <button onclick="sendCommand('reset')" class="btn-red" style="margin-top: 1rem;">RESET ALL</button>
+                
+                <button id="initBtn" onclick="sendCommand('initiate_performance')" class="btn-green btn-disabled" style="margin-top: 1rem; padding: 1.5rem;">INITIATE PERFORMANCE</button>
+                
+                <button onclick="sendCommand('reset')" class="btn-red" style="margin-top: 2rem; font-size: 0.8rem; padding: 0.5rem;">RESET ALL</button>
             </div>
 
             <div class="stat-card">
                 <h3>Live Status</h3>
-                <p>Submissions: <span id="subCount" style="color: var(--primary-color); font-size: 2rem; font-weight: 800;">0</span></p>
-                <p>Status: <span id="statusText" style="color: var(--secondary-color);">Lobby</span></p>
-                <div id="recentLog" style="font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 1rem;"></div>
+                <p>Submissions: <span id="subCount" style="color: var(--primary-color); font-size: 2.5rem; font-weight: 900;">0</span></p>
+                <p>Status: <span id="statusText" style="color: var(--secondary-color); font-weight: 800;">LOBBY</span></p>
+                <div id="recentLog" style="font-size: 0.7rem; color: rgba(255,255,255,0.3); margin-top: 1.5rem; height: 150px; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;"></div>
             </div>
         </div>
     </div>
@@ -41,20 +53,44 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        const initBtn = document.getElementById('initBtn');
         
         function sendCommand(cmd) {
             const mode = document.getElementById('modeSelect').value;
-            socket.emit('admin_command', { command: cmd, mode: mode });
+            const abletonIP = document.getElementById('abletonIP').value;
+            const unityIP = document.getElementById('unityIP').value;
+            socket.emit('admin_command', { 
+                command: cmd, 
+                mode: mode,
+                abletonIP: abletonIP,
+                unityIP: unityIP
+            });
         }
 
         socket.on("aggregator_update", data => {
             document.getElementById('subCount').textContent = data.count;
             const log = document.getElementById('recentLog');
-            log.innerHTML = `<div>${data.recentUser} joined</div>` + log.innerHTML;
+            log.innerHTML = `<div>User <b>${data.username}</b> locked in</div>` + log.innerHTML;
+        });
+
+        socket.on("results_ready", () => {
+            initBtn.classList.remove('btn-disabled');
+            document.getElementById('statusText').textContent = "RESULTS READY";
+        });
+
+        socket.on("performance_started", () => {
+            initBtn.style.boxShadow = "0 0 30px #10b981";
+            document.getElementById('statusText').textContent = "PERFORMING";
         });
 
         socket.on("phase_change", state => {
             document.getElementById('statusText').textContent = state.phase.toUpperCase();
+            if (state.phase === 'lobby') {
+                initBtn.classList.add('btn-disabled');
+                initBtn.style.boxShadow = "none";
+                document.getElementById('subCount').textContent = "0";
+                document.getElementById('recentLog').innerHTML = "";
+            }
         });
     </script>
 </body>

@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const http = require('http');
 const { Server } = require('socket.io');
+const { Client } = require('node-osc');
 
 const app = express();
 const server = http.createServer(app);
@@ -27,10 +28,17 @@ io.use((socket, next) => {
 let globalClickCount = 0;
 let users = {};
 let submissions = [];
+let lastCalculatedResults = null;
 let appState = {
     phase: "lobby", // lobby, active, results
     mode: "both",   // audio, visual, both
     round: 1        // Incrementing this effectively resets all users
+};
+
+let oscTargets = {
+    ableton: { ip: "127.0.0.1", port: 11002 },
+    unity: { ip: "127.0.0.1", port: 11003 },
+    generator: { ip: "127.0.0.1", port: 11007 } 
 };
 
 /* ---------- HELPERS ---------- */
@@ -78,7 +86,6 @@ function calculateAverages() {
             if (val) summary.fx[name][val] = (summary.fx[name][val] || 0) + 1;
         });
 
-        // Dancers
         ["d1", "d2"].forEach(d => {
             const char = s[`${d}_character`];
             const move = s[`${d}_move`];
@@ -86,7 +93,6 @@ function calculateAverages() {
             if (move) summary.dancers[`${d}_move`][move] = (summary.dancers[`${d}_move`][move] || 0) + 1;
         });
 
-        // Band
         members.forEach(m => {
             const char = s[`${m}_char`];
             if (char) summary.band[m][char] = (summary.band[m][char] || 0) + 1;
@@ -129,19 +135,13 @@ app.get('/', (req, res) => {
     if (!req.session.username) {
         return res.sendFile(__dirname + "/public/username.html");
     }
-    
-    // Check if they submitted for the CURRENT round
     const alreadySubmitted = req.session.lastSubmittedRound === appState.round;
-
     if (alreadySubmitted && appState.phase !== "results") {
         return res.sendFile(__dirname + "/public/waiting.html");
     }
-
-    // Admin-controlled redirection
     if (appState.phase === "lobby") {
         return res.sendFile(__dirname + "/public/lobby.html");
     }
-
     res.sendFile(__dirname + `/public/${appState.mode}.html`);
 });
 
@@ -151,16 +151,13 @@ app.get('/aggregator', (req, res) => {
 
 app.post('/submit', (req, res) => {
     if (req.session.lastSubmittedRound === appState.round) return res.redirect("/");
-
     submissions.push(req.body);
     req.session.lastSubmittedRound = appState.round;
-    
     globalClickCount++;
     io.emit("aggregator_update", { 
         count: globalClickCount,
         username: req.session.username 
     });
-
     res.redirect("/");
 });
 
@@ -168,12 +165,8 @@ app.post('/submit', (req, res) => {
 
 io.on("connection", (socket) => {
     const session = socket.request.session;
-
     if (session?.username) {
-        users[socket.id] = {
-            username: session.username,
-            mode: appState.mode
-        };
+        users[socket.id] = { username: session.username, mode: appState.mode };
         sendUserList();
     }
 
@@ -183,8 +176,6 @@ io.on("connection", (socket) => {
             appState.mode = data.mode;
             submissions = [];
             globalClickCount = 0;
-            
-            // Broadcast the phase change and also a redirect command
             io.emit("phase_change", appState);
             io.emit("redirect_clients", { page: "/" });
         }
@@ -192,18 +183,88 @@ io.on("connection", (socket) => {
         if (data.command === "lock_and_average") {
             appState.phase = "results";
             const results = calculateAverages();
-            if (results) results.mode = appState.mode; // Pass mode to aggregator
+            if (results) {
+                results.mode = appState.mode;
+                lastCalculatedResults = results;
+            }
             io.emit("results_ready", results);
+        }
+
+        if (data.command === "initiate_performance") {
+            if (!lastCalculatedResults) return;
+            
+            if (data.abletonIP) {
+                oscTargets.ableton.ip = data.abletonIP;
+                oscTargets.generator.ip = data.abletonIP; 
+            }
+            if (data.unityIP) oscTargets.unity.ip = data.unityIP;
+
+            const abletonClient = new Client(oscTargets.ableton.ip, oscTargets.ableton.port);
+            const generatorClient = new Client(oscTargets.generator.ip, oscTargets.generator.port);
+            const unityClient = new Client(oscTargets.unity.ip, oscTargets.unity.port);
+
+            // 1. Send Setup to Ableton Controller (Port 11002)
+            abletonClient.send('/performance/setup', [
+                lastCalculatedResults.genre,
+                parseFloat(lastCalculatedResults.tempo),
+                lastCalculatedResults.mode_val,
+                parseInt(lastCalculatedResults.humanGuitarTone)
+            ], () => abletonClient.close());
+
+            // 2. Trigger Z-Groove AI Generation (Port 11007) - DRUM SEEDED
+            const feelMapping = {
+                "drive/rock": "Content_Drive",
+                "pulse/hiphop": "Content_Pulse",
+                "groove/funky": "Content_Groove",
+                "elegant/atmospheric": "Content_Elegance"
+            };
+            const progMapping = { "guitar": 24, "bass": 33, "piano": 0, "strings": 48, "winds": 73 };
+            
+            const targetProgs = []; 
+            for (let [inst, count] of Object.entries(lastCalculatedResults.instruments)) {
+                if (Math.round((count / lastCalculatedResults.count) * 100) >= 50) {
+                    if (progMapping[inst] !== undefined) targetProgs.push(progMapping[inst]);
+                }
+            }
+
+            generatorClient.send('/web/drum_seeded_request', [
+                feelMapping[lastCalculatedResults.genre] || "Content_Groove",
+                ...targetProgs
+            ], () => generatorClient.close());
+
+            // 3. Send Visuals to Unity (Port 11003)
+            const envMap = { 'haunted forest': 0, 'mars scape': 1, 'laser grid': 2 };
+            const getSkinIdx = (charName) => {
+                if (!charName) return 0;
+                if (charName.match(/vampire|werewolf|moose|goblin/)) return 2;
+                if (charName.match(/flesh|dark|lizard|webbed/)) return 1;
+                return 0; // robots
+            };
+
+            unityClient.send('/environment/skybox', envMap[lastCalculatedResults.environment] || 0);
+            unityClient.send('/avatar/dancer1/skin', getSkinIdx(lastCalculatedResults.dancers.d1.char));
+            unityClient.send('/avatar/dancer2/skin', getSkinIdx(lastCalculatedResults.dancers.d2.char));
+            
+            const m = lastCalculatedResults.band.members;
+            unityClient.send('/avatar/drum1/skin', getSkinIdx(m.drum1));
+            unityClient.send('/avatar/drum2/skin', getSkinIdx(m.drum2));
+            unityClient.send('/avatar/guitar/skin', getSkinIdx(m.guitar));
+            unityClient.send('/avatar/bass/skin', getSkinIdx(m.bass));
+            unityClient.send('/avatar/violin/skin', getSkinIdx(m.strings));
+
+            unityClient.close();
+            console.log("Reverted to Separate Initiation Packets.");
+            io.emit("performance_started");
         }
 
         if (data.command === "reset") {
             appState.phase = "lobby";
-            appState.round++; // CRITICAL: Incrementing the round ID resets all user sessions
+            appState.round++;
             submissions = [];
             globalClickCount = 0;
-            
+            lastCalculatedResults = null;
             io.emit("phase_change", appState);
-            io.emit("aggregator_reset"); // Custom event to clear the projection screen
+            io.emit("aggregator_reset");
             io.emit("redirect_clients", { page: "/" });
         }
     });
@@ -218,26 +279,17 @@ app.post('/set-username', (req, res) => {
     const { username } = req.body;
     if (username && username.trim() !== "") {
         req.session.username = username.trim();
-        req.session.hasSubmitted = false; // Reset on new login
+        req.session.lastSubmittedRound = 0;
     }
     res.redirect("/");
 });
 
 function sendUserList() {
-
     const grouped = { audio: [], visual: [], both: [] };
-
     for (let id in users) {
         const user = users[id];
-
-        if (grouped[user.mode]) {
-            grouped[user.mode].push({
-                socketId: id,
-                username: user.username
-            });
-        }
+        if (grouped[user.mode]) grouped[user.mode].push({ socketId: id, username: user.username });
     }
-
     io.emit("user_list_update", grouped);
 }
 
