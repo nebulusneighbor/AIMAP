@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 97302459}
   - component: {fileID: 97302460}
+  - component: {fileID: 97302461}
   m_Layer: 0
   m_Name: drum2_Slot
   m_TagString: Untagged
@@ -172,6 +173,23 @@ MonoBehaviour:
   skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
+--- !u!114 &97302461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 97302458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
+  roleId: drum2
+  instrumentMode: 2
+  avatarSlot: {fileID: 97302460}
+  instrumentRigManager: {fileID: 0}
+  driveAvatarPerformanceState: 1
 --- !u!1 &289521662
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,6 +313,7 @@ GameObject:
   m_Component:
   - component: {fileID: 382729933}
   - component: {fileID: 382729934}
+  - component: {fileID: 382729935}
   m_Layer: 0
   m_Name: violin_Slot
   m_TagString: Untagged
@@ -338,6 +357,23 @@ MonoBehaviour:
   skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
+--- !u!114 &382729935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382729932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
+  roleId: violin
+  instrumentMode: 3
+  avatarSlot: {fileID: 382729934}
+  instrumentRigManager: {fileID: 0}
+  driveAvatarPerformanceState: 1
 --- !u!1 &500378399
 GameObject:
   m_ObjectHideFlags: 0
@@ -348,6 +384,7 @@ GameObject:
   m_Component:
   - component: {fileID: 500378401}
   - component: {fileID: 500378400}
+  - component: {fileID: 500378402}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -435,6 +472,35 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &500378402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 500378399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &627940660
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,7 +537,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Diagnostics.AimapOscTestConsole
   oscTransmitter: {fileID: 627940662}
-  targetHost: 127.0.0.1
+  targetHost: 10.0.0.124
   targetPort: 11003
   roleIds:
   - dancer1
@@ -481,6 +547,10 @@ MonoBehaviour:
   - bass
   - guitar
   - violin
+  midiNote: 60
+  randomMidiCount: 8
+  randomMidiNoteRange: {x: 48, y: 72}
+  randomMidiStepSeconds: 0.2
 --- !u!114 &627940662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -502,7 +572,7 @@ MonoBehaviour:
   _localReceiver: {fileID: 0}
   _localHost: 192.168.0.201
   _localPort: 7000
-  _remoteHost: 127.0.0.1
+  _remoteHost: 10.0.0.124
   _remotePort: 11003
   _useBundle: 0
 --- !u!114 &627940663
@@ -521,6 +591,7 @@ MonoBehaviour:
   avatarSlots: []
   environmentController: {fileID: 0}
   diagnostics: {fileID: 0}
+  debugPanel: {fileID: 0}
 --- !u!114 &627940664
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -577,25 +648,6 @@ MonoBehaviour:
   _localHostMode: 0
   _localHost: 192.168.0.201
   _localPort: 11003
---- !u!114 &627940668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 627940660}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbba286dc10e549b2bdec947ef8dbd3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: extOSC::extOSC.OSCReceiver
-  _autoConnect: 1
-  _closeOnPause: 0
-  _mapBundle: {fileID: 0}
-  _workInEditor: 0
-  _localHostMode: 0
-  _localHost: 192.168.0.201
-  _localPort: 2348
 --- !u!4 &627940667
 Transform:
   m_ObjectHideFlags: 0
@@ -618,6 +670,25 @@ Transform:
   - {fileID: 382729933}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &627940668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627940660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbba286dc10e549b2bdec947ef8dbd3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: extOSC::extOSC.OSCReceiver
+  _autoConnect: 1
+  _closeOnPause: 0
+  _mapBundle: {fileID: 0}
+  _workInEditor: 0
+  _localHostMode: 0
+  _localHost: 192.168.0.201
+  _localPort: 2348
 --- !u!1 &900499088
 GameObject:
   m_ObjectHideFlags: 0
@@ -628,6 +699,7 @@ GameObject:
   m_Component:
   - component: {fileID: 900499089}
   - component: {fileID: 900499090}
+  - component: {fileID: 900499091}
   m_Layer: 0
   m_Name: dancer2_Slot
   m_TagString: Untagged
@@ -671,6 +743,23 @@ MonoBehaviour:
   skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
+--- !u!114 &900499091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900499088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
+  roleId: dancer2
+  instrumentMode: 0
+  avatarSlot: {fileID: 900499090}
+  instrumentRigManager: {fileID: 0}
+  driveAvatarPerformanceState: 1
 --- !u!1 &1056764576
 GameObject:
   m_ObjectHideFlags: 0
@@ -681,6 +770,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1056764577}
   - component: {fileID: 1056764578}
+  - component: {fileID: 1056764579}
   m_Layer: 0
   m_Name: guitar_Slot
   m_TagString: Untagged
@@ -724,6 +814,23 @@ MonoBehaviour:
   skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
+--- !u!114 &1056764579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056764576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
+  roleId: guitar
+  instrumentMode: 3
+  avatarSlot: {fileID: 1056764578}
+  instrumentRigManager: {fileID: 0}
+  driveAvatarPerformanceState: 1
 --- !u!1 &1276818995
 GameObject:
   m_ObjectHideFlags: 0
@@ -734,6 +841,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1276818997}
   - component: {fileID: 1276818996}
+  - component: {fileID: 1276818998}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -807,6 +915,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1276818998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1276818995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!1 &1283528483
 GameObject:
   m_ObjectHideFlags: 0
@@ -817,6 +969,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1283528484}
   - component: {fileID: 1283528485}
+  - component: {fileID: 1283528486}
   m_Layer: 0
   m_Name: bass_Slot
   m_TagString: Untagged
@@ -860,6 +1013,23 @@ MonoBehaviour:
   skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
+--- !u!114 &1283528486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283528483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
+  roleId: bass
+  instrumentMode: 3
+  avatarSlot: {fileID: 1283528485}
+  instrumentRigManager: {fileID: 0}
+  driveAvatarPerformanceState: 1
 --- !u!1 &1822167121
 GameObject:
   m_ObjectHideFlags: 0
@@ -870,6 +1040,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1822167122}
   - component: {fileID: 1822167123}
+  - component: {fileID: 1822167124}
   m_Layer: 0
   m_Name: drum1_Slot
   m_TagString: Untagged
@@ -913,6 +1084,23 @@ MonoBehaviour:
   skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
+--- !u!114 &1822167124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822167121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
+  roleId: drum1
+  instrumentMode: 2
+  avatarSlot: {fileID: 1822167123}
+  instrumentRigManager: {fileID: 0}
+  driveAvatarPerformanceState: 1
 --- !u!1 &1901115145
 GameObject:
   m_ObjectHideFlags: 0
@@ -923,6 +1111,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1901115146}
   - component: {fileID: 1901115147}
+  - component: {fileID: 1901115148}
   m_Layer: 0
   m_Name: dancer1_Slot
   m_TagString: Untagged
@@ -966,6 +1155,23 @@ MonoBehaviour:
   skinVariants: []
   bindOnStart: 1
   defaultFamilyIndex: 0
+--- !u!114 &1901115148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901115145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
+  roleId: dancer1
+  instrumentMode: 0
+  avatarSlot: {fileID: 1901115147}
+  instrumentRigManager: {fileID: 0}
+  driveAvatarPerformanceState: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

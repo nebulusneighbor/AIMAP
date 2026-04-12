@@ -82,6 +82,9 @@ Unity/AIMAP/**
 !Unity/AIMAP/Assets/Scenes/**
 !Unity/AIMAP/Assets/Settings/
 !Unity/AIMAP/Assets/Settings/**
+!Unity/AIMAP/Assets/xr-jam/
+!Unity/AIMAP/Assets/xr-jam/**
+!Unity/AIMAP/Assets/xr-jam.meta
 !Unity/AIMAP/Assets/InputSystem_Actions.inputactions
 !Unity/AIMAP/Assets/InputSystem_Actions.inputactions.meta
 !Unity/AIMAP/Assets/Editor.meta

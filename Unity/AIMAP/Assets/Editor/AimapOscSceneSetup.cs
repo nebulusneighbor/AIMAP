@@ -15,6 +15,7 @@ namespace AIMAP.Editor
     {
         private const string MainScenePath = "Assets/Scenes/AIMAPVR.unity";
         private const string TestScenePath = "Assets/Scenes/AIMAPVR_OscTest.unity";
+        private const string QuestOscHost = "10.0.0.124";
         private const int WebOscPort = 11003;
         private const int AbletonOscPort = 2348;
 
@@ -59,7 +60,7 @@ namespace AIMAP.Editor
 
             foreach (var roleConfig in RoleConfigs)
             {
-                CreateSlot(manager.transform, roleConfig, useSceneAvatarBinding: true);
+                CreateSlot(manager.transform, roleConfig, useSceneAvatarBinding: true, addMidiHandler: false);
             }
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -91,7 +92,7 @@ namespace AIMAP.Editor
 
             foreach (var roleConfig in RoleConfigs)
             {
-                CreateSlot(manager.transform, roleConfig, useSceneAvatarBinding: false);
+                CreateSlot(manager.transform, roleConfig, useSceneAvatarBinding: false, addMidiHandler: true);
             }
 
             EditorSceneManager.SaveScene(scene, TestScenePath);
@@ -125,7 +126,7 @@ namespace AIMAP.Editor
             if (includeTestConsole)
             {
                 var transmitter = manager.AddComponent<OSCTransmitter>();
-                transmitter.RemoteHost = "127.0.0.1";
+                transmitter.RemoteHost = QuestOscHost;
                 transmitter.RemotePort = WebOscPort;
 
                 var testConsole = manager.AddComponent<AimapOscTestConsole>();
@@ -135,7 +136,7 @@ namespace AIMAP.Editor
             return manager;
         }
 
-        private static void CreateSlot(Transform parent, RoleConfig roleConfig, bool useSceneAvatarBinding)
+        private static void CreateSlot(Transform parent, RoleConfig roleConfig, bool useSceneAvatarBinding, bool addMidiHandler)
         {
             var slotObject = new GameObject($"{roleConfig.RoleId}_Slot");
             slotObject.transform.SetParent(parent);
@@ -153,6 +154,11 @@ namespace AIMAP.Editor
                 roleConfig.ActiveStateName,
                 fallbackPrefab,
                 BuildSkinVariants(roleConfig.ControllerPath));
+
+            if (addMidiHandler)
+            {
+                slotObject.AddComponent<AimapAvatarMidiHandler>();
+            }
         }
 
         private static List<AvatarSkinVariant> BuildSkinVariants(string controllerPath)

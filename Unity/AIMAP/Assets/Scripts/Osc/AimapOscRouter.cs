@@ -4,6 +4,7 @@ using AIMAP.Diagnostics;
 using AIMAP.Environment;
 using extOSC;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace AIMAP.Osc
 {
@@ -13,6 +14,10 @@ namespace AIMAP.Osc
         [SerializeField] private AvatarSlotController[] avatarSlots;
         [SerializeField] private SkyboxEnvironmentController environmentController;
         [SerializeField] private AimapOscDiagnostics diagnostics;
+        [SerializeField] private AimapOscPortDebugPanel debugPanel;
+
+        [SerializeField] private readonly Dictionary<string, AimapAvatarMidiHandler> _midiHandlersByRole =
+            new Dictionary<string, AimapAvatarMidiHandler>(StringComparer.OrdinalIgnoreCase);
 
         private void Awake()
         {
@@ -29,6 +34,11 @@ namespace AIMAP.Osc
             if (diagnostics == null)
             {
                 diagnostics = GetComponent<AimapOscDiagnostics>();
+            }
+
+            if (debugPanel == null)
+            {
+                debugPanel = GetComponent<AimapOscPortDebugPanel>();
             }
 
             if (avatarSlots == null || avatarSlots.Length == 0)
@@ -62,6 +72,8 @@ namespace AIMAP.Osc
                 return;
             }
 
+            _midiHandlersByRole.Clear();
+
             for (var r = 0; r < oscReceivers.Length; r++)
             {
                 var receiver = oscReceivers[r];
@@ -71,30 +83,48 @@ namespace AIMAP.Osc
                 }
 
                 receiver.ClearBinds();
+                var listenPort = receiver.LocalPort;
 
                 if (avatarSlots != null)
                 {
                     for (var index = 0; index < avatarSlots.Length; index++)
                     {
                         var slot = avatarSlots[index];
-                        if (slot == null || string.IsNullOrWhiteSpace(slot.RoleId))
+                        if (slot == null)
                         {
                             continue;
                         }
 
-                        var roleId = slot.RoleId;
-                        receiver.Bind($"/avatar/{roleId}/state", message => HandleAvatarState(roleId, message));
-                        receiver.Bind($"/avatar/{roleId}/skin", message => HandleAvatarSkin(roleId, message));
+                        var midiHandler = FindMidiHandler(slot);
+                        var roleId = midiHandler != null && !string.IsNullOrWhiteSpace(midiHandler.RoleId)
+                            ? midiHandler.RoleId
+                            : slot.RoleId;
+                        if (string.IsNullOrWhiteSpace(roleId))
+                        {
+                            continue;
+                        }
+
+                        if (midiHandler != null)
+                        {
+                            _midiHandlersByRole[roleId] = midiHandler;
+                            receiver.Bind($"/avatar/{roleId}/midi", message => HandleAvatarMidi(roleId, listenPort, message));
+                        }
+                        else
+                        {
+                            receiver.Bind($"/avatar/{roleId}/state", message => HandleAvatarState(roleId, listenPort, message));
+                        }
+
+                        receiver.Bind($"/avatar/{roleId}/skin", message => HandleAvatarSkin(roleId, listenPort, message));
                     }
                 }
 
-                receiver.Bind("/environment/skybox", HandleEnvironmentSkybox);
+                receiver.Bind("/environment/skybox", message => HandleEnvironmentSkybox(listenPort, message));
             }
         }
 
-        private void HandleAvatarState(string roleId, OSCMessage message)
+        private void HandleAvatarState(string roleId, int listenPort, OSCMessage message)
         {
-            diagnostics?.RegisterMessage(message?.Address);
+            ReportMessage(listenPort, message);
             var slot = FindSlot(roleId);
             if (slot == null)
             {
@@ -104,9 +134,9 @@ namespace AIMAP.Osc
             slot.SetPerformanceState(ReadBool(message, false));
         }
 
-        private void HandleAvatarSkin(string roleId, OSCMessage message)
+        private void HandleAvatarSkin(string roleId, int listenPort, OSCMessage message)
         {
-            diagnostics?.RegisterMessage(message?.Address);
+            ReportMessage(listenPort, message);
             var slot = FindSlot(roleId);
             if (slot == null)
             {
@@ -116,10 +146,43 @@ namespace AIMAP.Osc
             slot.SetSkin(ReadInt(message, 0));
         }
 
-        private void HandleEnvironmentSkybox(OSCMessage message)
+        private void HandleAvatarMidi(string roleId, int listenPort, OSCMessage message)
+        {
+            ReportMessage(listenPort, message);
+            if (!_midiHandlersByRole.TryGetValue(roleId, out var midiHandler) || midiHandler == null)
+            {
+                var slot = FindSlot(roleId);
+                midiHandler = FindMidiHandler(slot);
+                if (midiHandler == null)
+                {
+                    return;
+                }
+
+                _midiHandlersByRole[roleId] = midiHandler;
+            }
+
+            if (AimapAvatarMidiMessageDecoder.TryDecode(message, out var midiMessage))
+            {
+                midiHandler.ApplyMidiMessage(midiMessage);
+                return;
+            }
+
+            Debug.LogWarning(
+                $"Failed to decode OSC MIDI message for role '{roleId}' at '{message?.Address}'. " +
+                "Expected [noteNumber], [noteNumber, velocity], [channel, noteNumber, velocity], or [noteState, channel, noteNumber, velocity].",
+                this);
+        }
+
+        private void HandleEnvironmentSkybox(int listenPort, OSCMessage message)
+        {
+            ReportMessage(listenPort, message);
+            environmentController?.SetSkybox(ReadInt(message, 0));
+        }
+
+        private void ReportMessage(int listenPort, OSCMessage message)
         {
             diagnostics?.RegisterMessage(message?.Address);
-            environmentController?.SetSkybox(ReadInt(message, 0));
+            debugPanel?.RegisterMessage(listenPort, message?.Address, message);
         }
 
         private static int ReadInt(OSCMessage message, int fallback)
@@ -177,9 +240,56 @@ namespace AIMAP.Osc
             for (var index = 0; index < avatarSlots.Length; index++)
             {
                 var slot = avatarSlots[index];
-                if (slot != null && string.Equals(slot.RoleId, roleId, StringComparison.OrdinalIgnoreCase))
+                if (slot == null)
+                {
+                    continue;
+                }
+
+                var midiHandler = FindMidiHandler(slot);
+                if (midiHandler != null && midiHandler.MatchesRole(roleId))
                 {
                     return slot;
+                }
+
+                if (string.Equals(slot.RoleId, roleId, StringComparison.OrdinalIgnoreCase))
+                {
+                    return slot;
+                }
+            }
+
+            return null;
+        }
+
+        private static AimapAvatarMidiHandler FindMidiHandler(AvatarSlotController slot)
+        {
+            if (slot == null)
+            {
+                return null;
+            }
+
+            var onSlot = slot.GetComponent<AimapAvatarMidiHandler>();
+            if (onSlot != null)
+            {
+                return onSlot;
+            }
+
+            var children = slot.GetComponentsInChildren<AimapAvatarMidiHandler>(true);
+            for (var index = 0; index < children.Length; index++)
+            {
+                var child = children[index];
+                if (child != null)
+                {
+                    return child;
+                }
+            }
+
+            var parents = slot.GetComponentsInParent<AimapAvatarMidiHandler>(true);
+            for (var index = 0; index < parents.Length; index++)
+            {
+                var parent = parents[index];
+                if (parent != null)
+                {
+                    return parent;
                 }
             }
 

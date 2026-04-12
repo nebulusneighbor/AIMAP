@@ -133,8 +133,10 @@ namespace AIMAP.Diagnostics
                 var role = RoleIds[index];
                 var stateAddress = $"/avatar/{role}/state";
                 var skinAddress = $"/avatar/{role}/skin";
+                var midiAddress = $"/avatar/{role}/midi";
                 receiver.Bind(stateAddress, message => HandleMessageReceived(stateAddress, message));
                 receiver.Bind(skinAddress, message => HandleMessageReceived(skinAddress, message));
+                receiver.Bind(midiAddress, message => HandleMessageReceived(midiAddress, message));
             }
 
             const string skyboxAddress = "/environment/skybox";
