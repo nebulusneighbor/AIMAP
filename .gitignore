@@ -92,7 +92,8 @@ Unity/AIMAP/**
 !Unity/AIMAP/Assets/Scenes.meta
 !Unity/AIMAP/Assets/Settings.meta
 
-# Always keep heavy binary assets out of git (share separately)
+# Always keep heavy binary assets out of git (share separately).
+# Exception: xr-jam may track models/prefab-related binaries; other Assets paths stay excluded.
 Unity/AIMAP/Assets/**/*.fbx
 Unity/AIMAP/Assets/**/*.glb
 Unity/AIMAP/Assets/**/*.gltf
@@ -100,4 +101,10 @@ Unity/AIMAP/Assets/**/*.exr
 Unity/AIMAP/Assets/**/*.zip
 Unity/AIMAP/Assets/**/Gemini_Generated_*.png
 Unity/AIMAP/ExternalAssets/
+!Unity/AIMAP/Assets/xr-jam/**/*.fbx
+!Unity/AIMAP/Assets/xr-jam/**/*.glb
+!Unity/AIMAP/Assets/xr-jam/**/*.gltf
+!Unity/AIMAP/Assets/xr-jam/**/*.exr
+!Unity/AIMAP/Assets/xr-jam/**/*.zip
+!Unity/AIMAP/Assets/xr-jam/**/Gemini_Generated_*.png
 
