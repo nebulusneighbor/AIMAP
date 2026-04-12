@@ -32,6 +32,13 @@ The current osc test scene `Unity/AIMAP/Assets/Scenes/AIMAPVR_OscTest.unity` bin
 
 Because of that, MIDI reception depends on the scene having an `AimapAvatarMidiHandler` for the target role.
 
+Important discovery detail:
+
+- The router finds handlers only on the slot object itself, its children, or its parents.
+- In `AIMAPVR`, slot objects can point at avatars by `targetAvatarName` without those avatars being in the slot hierarchy.
+- Because of that, putting `AimapAvatarMidiHandler` only on a standalone avatar prefab is not enough unless that avatar is also under the slot hierarchy.
+- For the current main scene structure, the safest placement is on the `*_Slot` object itself or in that slot's parent/child chain.
+
 ## Supported Addresses
 
 ### Avatar State
@@ -187,6 +194,7 @@ For the built-in osc test scene:
 - The test console now sends the one-value MIDI payload format: `[noteNumber]`.
 - The saved test scene now has `AimapAvatarMidiHandler` components on all test roles, so the original router will bind MIDI addresses there.
 - The saved test scene transmitter target host is set to the Quest device IP `10.0.0.124`.
+- The main `AIMAPVR` scene may need handlers on the slot hierarchy rather than only on the named avatar object if you want the router to bind MIDI there.
 
 ## Common Debug Checks
 
@@ -198,3 +206,4 @@ If MIDI still does not react:
 4. Confirm the payload is one of `[noteNumber]`, `[noteNumber, velocity]`, `[channel, noteNumber, velocity]`, or `[noteState, channel, noteNumber, velocity]`.
 5. Check the Unity Console for the router warning about failed MIDI decode.
 6. Check that the scene object for that role actually has an `AimapAvatarMidiHandler`.
+7. In `AIMAPVR`, check that the handler is on the slot object or within the slot hierarchy, not only on a separate avatar object found by name.

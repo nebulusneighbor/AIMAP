@@ -26,6 +26,7 @@ extOSC OSCReceiver(s) on listen port(s)
 ```
 
 - **Without** `AimapAvatarMidiHandler` on a slot: router binds `/avatar/{roleId}/state` (not `/midi`) for that slot; skin and skybox still bind.
+- **Important scene wiring rule:** `AimapOscRouter.FindMidiHandler` only searches the slot object itself plus its children and parents. In `AIMAPVR`, slot objects such as `guitar_Slot` use `targetAvatarName` and are not automatically parented to the named avatar object, so putting `AimapAvatarMidiHandler` only on the standalone avatar prefab is not enough unless that avatar is also in the slot hierarchy.
 
 ---
 
@@ -54,10 +55,14 @@ Bound **per** `OSCReceiver` instance, for each `AvatarSlotController` with a non
 
 **Supported OSC argument layouts:**
 
-1. **4+ values:** `[noteOnState, channel, noteNumber, velocity]` — first arg is bool-like (true/false, int, float, or strings like `noteon` / `off` / `on` / etc.).
-2. **3 values:** `[channel, noteNumber, velocity]` — note-on inferred as `velocity > 0`.
+1. **1 value:** `[noteNumber]` — defaults to channel `1`, velocity `127`, treated as a transient note trigger.
+2. **2 values:** `[noteNumber, velocity]` — defaults to channel `1`; treated as a transient trigger layout.
+3. **3 values:** `[channel, noteNumber, velocity]` — note-on inferred as `velocity > 0`.
+4. **4+ values:** `[noteOnState, channel, noteNumber, velocity]` — first arg is bool-like (true/false, int, float, or strings like `noteon` / `off` / `on` / etc.).
 
 **Sanitization after decode:** channel ∈ [1, 16], note ∈ [0, 127], velocity ∈ [0, 127].
+
+**Transient behavior:** One-value and two-value layouts set `ShouldSustain = false`, so `AimapAvatarMidiHandler` processes them as trigger-style events and clears active notes afterward instead of requiring a matching note-off.
 
 **File:** `Assets/Scripts/Osc/AimapAvatarMidiMessage.cs`.
 
@@ -78,9 +83,11 @@ Bound **per** `OSCReceiver` instance, for each `AvatarSlotController` with a non
 | Drums | 2 | Channel **1** only. Even `noteNumber` → left hit, odd → right hit (boolean for current message note-on with velocity &gt; 0) |
 | Guitar | 3 | Fretting: any active note on channel **7 or 1** sets `GuitarLeftHand = clamp((leftNote - 40) / 10, 0, 1)`. `ShouldStrum` = note-on with velocity &gt; 0 on **every** message (not channel-filtered in code) |
 
-**Active note list:** `(noteNumber, channel)` pairs; note-on with velocity &gt; 0 adds, else removes.
+**Active note list:** `(noteNumber, channel)` pairs; note-on with velocity &gt; 0 adds, else removes. For transient note-only / note+velocity payloads, the handler clears the note list after processing.
 
 **Hookup:** `OnEnable` → `instrumentRigManager?.BindMidiHandler(this)`.
+
+**Placement guidance:** For the current `AIMAPVR` scene structure, the safest place for `AimapAvatarMidiHandler` is on the `*_Slot` object itself, or anywhere in that slot's parent/child hierarchy. A handler placed only on a separately named avatar object referenced by `targetAvatarName` will not be discovered by the router.
 
 ---
 
@@ -134,6 +141,8 @@ All use `UnityEngine.Animations.Rigging.Rig`.
 ## Scenes / assets (high level)
 
 - Main VR / app scenes under `Assets/Scenes/` (e.g. `AIMAPVR.unity` — subject to project changes).
+- `Assets/Scenes/AIMAPVR.unity` currently uses scene slot objects with `targetAvatarName` references; this matters for MIDI handler discovery because the router does not search arbitrary named objects outside the slot hierarchy.
+- `Assets/Scenes/AIMAPVR_OscTest.unity` includes slot-local `AimapAvatarMidiHandler` components for all test roles and an `AimapOscTestConsole` configured to send note-only MIDI payloads to the Quest IP `10.0.0.124`.
 - XR jam test scenes under `Assets/xr-jam/_Scenes/` including `networked-room-xrjam.unity` and `Tests/*`.
 - Prefabs under `Assets/xr-jam/Resources/` (`AvatarAnimV1`, `BasicAvatarSitting`, `BasicMIDISender`, `BasicPlayer`, etc.).
 
