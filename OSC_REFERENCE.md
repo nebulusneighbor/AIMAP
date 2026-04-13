@@ -104,6 +104,19 @@ Address pattern:
 /avatar/{roleId}/midi
 ```
 
+##Need to update
+now each instrument has 2 midi value
+/avatar/{roleid}1/midi,41,48 etc
+one is note, one is vality
+animation can fit volicty
+instrument:
+Drums,piano,Gutairs,Bass,Strings,winds
+dacemove:
+Hippop,brakedance,latin,1lessdrink in address
+/avatar/dancer1/move -> just for dancing pattern
+Once any osc message is sending to the headset, start dancing and stop after 5 sceonds
+Standing will be better
+
 Used by:
 
 - `AimapOscRouter.HandleAvatarMidi()`

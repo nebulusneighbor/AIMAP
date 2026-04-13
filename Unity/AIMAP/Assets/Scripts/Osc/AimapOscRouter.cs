@@ -106,8 +106,25 @@ namespace AIMAP.Osc
 
                         if (midiHandler != null)
                         {
-                            _midiHandlersByRole[roleId] = midiHandler;
-                            receiver.Bind($"/avatar/{roleId}/midi", message => HandleAvatarMidi(roleId, listenPort, message));
+                            var boundMidi = false;
+                            foreach (var oscMidiRole in midiHandler.OscRoleIds)
+                            {
+                                if (string.IsNullOrWhiteSpace(oscMidiRole))
+                                {
+                                    continue;
+                                }
+
+                                boundMidi = true;
+                                _midiHandlersByRole[oscMidiRole] = midiHandler;
+                                var boundRole = oscMidiRole;
+                                receiver.Bind($"/avatar/{boundRole}/midi", message => HandleAvatarMidi(boundRole, listenPort, message));
+                            }
+
+                            if (!boundMidi)
+                            {
+                                _midiHandlersByRole[roleId] = midiHandler;
+                                receiver.Bind($"/avatar/{roleId}/midi", message => HandleAvatarMidi(roleId, listenPort, message));
+                            }
                         }
                         else
                         {

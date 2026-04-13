@@ -1072,7 +1072,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
-  roleId: bass
+  roleId: bass1
+  secondaryRoleId: bass2
   instrumentMode: 3
   avatarSlot: {fileID: 342243158}
   instrumentRigManager: {fileID: 505950696}
@@ -1176,7 +1177,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
-  roleId: drum2
+  roleId: drum1
+  secondaryRoleId: drum2
   instrumentMode: 2
   avatarSlot: {fileID: 352019134}
   instrumentRigManager: {fileID: 543091581}
@@ -1998,9 +2000,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
-  roleId: keyboard
+  roleId: piano1
+  secondaryRoleId: piano2
   instrumentMode: 1
-  avatarSlot: {fileID: 751519223}
+  avatarSlot: {fileID: 657287590}
   instrumentRigManager: {fileID: 1241128595}
   driveAvatarPerformanceState: 1
 --- !u!114 &657287590
@@ -2339,7 +2342,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
-  roleId: guitar
+  roleId: guitar1
+  secondaryRoleId: guitar2
   instrumentMode: 3
   avatarSlot: {fileID: 751519223}
   instrumentRigManager: {fileID: 914009931}
@@ -3448,7 +3452,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
-  roleId: violin
+  roleId: strings1
+  secondaryRoleId: strings2
   instrumentMode: 3
   avatarSlot: {fileID: 1186279123}
   instrumentRigManager: {fileID: 564131090}
@@ -4240,7 +4245,7 @@ MonoBehaviour:
   _autoConnect: 1
   _closeOnPause: 0
   _mapBundle: {fileID: 0}
-  _workInEditor: 0
+  _workInEditor: 1
   _localHostMode: 0
   _localHost: 192.168.0.201
   _localPort: 11003
@@ -4282,7 +4287,7 @@ MonoBehaviour:
   _autoConnect: 1
   _closeOnPause: 0
   _mapBundle: {fileID: 0}
-  _workInEditor: 0
+  _workInEditor: 1
   _localHostMode: 0
   _localHost: 127.0.0.1
   _localPort: 2348
@@ -4795,6 +4800,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
   roleId: drum1
+  secondaryRoleId: drum2
   instrumentMode: 2
   avatarSlot: {fileID: 2069300566}
   instrumentRigManager: {fileID: 1556477289}

@@ -17,6 +17,7 @@ namespace AIMAP.Avatars
         }
 
         [SerializeField] private string roleId;
+        [SerializeField] private string secondaryRoleId;
         [SerializeField] private InstrumentRigMode instrumentMode = InstrumentRigMode.Keyboard;
         [SerializeField] private AvatarSlotController avatarSlot;
         [SerializeField] private InstrumentRigManager instrumentRigManager;
@@ -27,6 +28,31 @@ namespace AIMAP.Avatars
 
         public string RoleId => string.IsNullOrWhiteSpace(roleId) ? avatarSlot != null ? avatarSlot.RoleId : string.Empty : roleId;
         public int InstrumentMode => (int)instrumentMode;
+
+        /// <summary>
+        /// Distinct OSC path role IDs that route MIDI to this handler (primary <see cref="RoleId"/> plus optional <see cref="secondaryRoleId"/>).
+        /// </summary>
+        public IEnumerable<string> OscRoleIds
+        {
+            get
+            {
+                var primary = RoleId;
+                if (!string.IsNullOrWhiteSpace(primary))
+                {
+                    yield return primary.Trim();
+                }
+
+                if (!string.IsNullOrWhiteSpace(secondaryRoleId))
+                {
+                    var secondary = secondaryRoleId.Trim();
+                    if (string.IsNullOrWhiteSpace(primary)
+                        || !string.Equals(primary, secondary, StringComparison.OrdinalIgnoreCase))
+                    {
+                        yield return secondary;
+                    }
+                }
+            }
+        }
 
         public float KeyRightHand { get; private set; }
         public float KeyLeftHand { get; private set; }
@@ -64,8 +90,18 @@ namespace AIMAP.Avatars
 
         public bool MatchesRole(string incomingRoleId)
         {
-            return !string.IsNullOrWhiteSpace(incomingRoleId)
-                && string.Equals(RoleId, incomingRoleId, StringComparison.OrdinalIgnoreCase);
+            if (string.IsNullOrWhiteSpace(incomingRoleId))
+            {
+                return false;
+            }
+
+            if (string.Equals(RoleId, incomingRoleId, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return !string.IsNullOrWhiteSpace(secondaryRoleId)
+                && string.Equals(secondaryRoleId.Trim(), incomingRoleId, StringComparison.OrdinalIgnoreCase);
         }
 
         public void ApplyMidiMessage(AimapAvatarMidiMessage midiMessage)
