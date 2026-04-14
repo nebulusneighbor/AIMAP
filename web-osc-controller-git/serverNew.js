@@ -41,6 +41,18 @@ let oscTargets = {
     generator: { ip: "127.0.0.1", port: 11007 } 
 };
 
+function sendOscAsync(client, address, args = []) {
+    return new Promise((resolve, reject) => {
+        client.send(address, ...args, (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve();
+        });
+    });
+}
+
 /* ---------- HELPERS ---------- */
 
 function calculateAverages() {
@@ -241,30 +253,37 @@ io.on("connection", (socket) => {
                 return 0; // robots
             };
 
-            unityClient.send('/environment/skybox', envMap[lastCalculatedResults.environment] || 0);
-            unityClient.send('/avatar/dancer1/skin', getSkinIdx(lastCalculatedResults.dancers.d1.char));
-            unityClient.send('/avatar/dancer2/skin', getSkinIdx(lastCalculatedResults.dancers.d2.char));
-            unityClient.send('/avatar/dancer1/state', 1);
-            unityClient.send('/avatar/dancer2/state', 1);
-            unityClient.send('/avatar/dancer1/move', lastCalculatedResults.dancers.d1.move || 'hiphop');
-            unityClient.send('/avatar/dancer2/move', lastCalculatedResults.dancers.d2.move || 'hiphop');
-            
             const m = lastCalculatedResults.band.members;
-            unityClient.send('/avatar/drum1/skin', getSkinIdx(m.drum1));
-            unityClient.send('/avatar/drum2/skin', getSkinIdx(m.drum2));
-            unityClient.send('/avatar/guitar/skin', getSkinIdx(m.guitar));
-            unityClient.send('/avatar/bass/skin', getSkinIdx(m.bass));
-            unityClient.send('/avatar/strings/skin', getSkinIdx(m.strings));
+            const unityMessages = [
+                { address: '/environment/skybox', args: [envMap[lastCalculatedResults.environment] || 0] },
+                { address: '/avatar/dancer1/skin', args: [getSkinIdx(lastCalculatedResults.dancers.d1.char)] },
+                { address: '/avatar/dancer2/skin', args: [getSkinIdx(lastCalculatedResults.dancers.d2.char)] },
+                { address: '/avatar/dancer1/move', args: [lastCalculatedResults.dancers.d1.move || "default"] },
+                { address: '/avatar/dancer2/move', args: [lastCalculatedResults.dancers.d2.move || "default"] },
+                { address: '/avatar/drum1/skin', args: [getSkinIdx(m.drum1)] },
+                { address: '/avatar/drum2/skin', args: [getSkinIdx(m.drum2)] },
+                { address: '/avatar/guitar/skin', args: [getSkinIdx(m.guitar)] },
+                { address: '/avatar/bass/skin', args: [getSkinIdx(m.bass)] },
+                { address: '/avatar/violin/skin', args: [getSkinIdx(m.strings)] }
+            ];
 
-            unityClient.close();
-            console.log("Reverted to Separate Initiation Packets.");
-            io.emit("performance_started");
+            (async () => {
+                try {
+                    for (const msg of unityMessages) {
+                        await sendOscAsync(unityClient, msg.address, msg.args);
+                    }
+                    console.log(`Unity OSC sent to ${oscTargets.unity.ip}:${oscTargets.unity.port}`);
+                    io.emit("performance_started");
+                } catch (error) {
+                    console.error("Failed to send Unity OSC batch:", error);
+                    io.emit("performance_start_failed", { reason: "unity_osc_send_failed" });
+                } finally {
+                    unityClient.close();
+                }
+            })();
         }
 
         if (data.command === "reset") {
-            const unityClient = new Client(oscTargets.unity.ip, oscTargets.unity.port);
-            unityClient.send('/system/resetall', 1, () => unityClient.close());
-
             appState.phase = "lobby";
             appState.round++;
             submissions = [];
