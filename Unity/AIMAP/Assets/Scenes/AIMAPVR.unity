@@ -1246,7 +1246,7 @@ MonoBehaviour:
   targetAvatarName: ybot@bass
   roleController: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
   idleStateName: listen
-  activeStateName: listen
+  activeStateName: Guitarplay1
   fallbackPrefab: {fileID: 0}
   skinVariants: []
   bindOnStart: 1
@@ -2463,7 +2463,7 @@ MonoBehaviour:
   targetAvatarName: ybot@guitar
   roleController: {fileID: 9100000, guid: 031d004fefa244b0ca1bce3e737eeb46, type: 2}
   idleStateName: listen2
-  activeStateName: listen2
+  activeStateName: Guitarplay2
   fallbackPrefab: {fileID: 0}
   skinVariants: []
   bindOnStart: 1
@@ -4624,7 +4624,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 95b39eaf332904d00aa1b9e99b2588f2, type: 2}
   - {fileID: 2100000, guid: 77a3624cb06bf4decaa1f08a5252eba0, type: 2}
   - {fileID: 2100000, guid: 694d78a1bf1f643979d7a8cfc976ec09, type: 2}
-  defaultSkyboxIndex: 0
+  - {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  defaultSkyboxIndex: 4
   applyOnStart: 1
   trainingStageSkyboxIndex: 0
   trainingStageGlowObject: {fileID: 716567849}

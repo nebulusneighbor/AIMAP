@@ -54,6 +54,11 @@ namespace AIMAP.Environment
             _diagnostics?.RegisterSkyboxChange(_currentSkyboxIndex);
         }
 
+        public void ResetToDefaultSkybox()
+        {
+            SetSkybox(defaultSkyboxIndex);
+        }
+
         private void ResolveTrainingStageGlowObject()
         {
             if (trainingStageGlowObject != null || string.IsNullOrWhiteSpace(trainingStageGlowObjectName))

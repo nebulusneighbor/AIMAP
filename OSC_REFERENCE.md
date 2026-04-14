@@ -31,6 +31,7 @@ The main scene `Unity/AIMAP/Assets/Scenes/AIMAPVR.unity` binds these OSC-facing 
 - If a slot does not have an `AimapAvatarMidiHandler`, the router binds `/avatar/{roleId}/state`.
 - The router always binds `/avatar/{roleId}/skin`.
 - The router always binds `/environment/skybox`.
+- The router binds `/system/resetall` to restore scene defaults (default skybox + all avatar/dancer performance state idle).
 
 Because of that, MIDI reception depends on the scene having an `AimapAvatarMidiHandler` for the target role.
 
@@ -110,6 +111,25 @@ Address pattern:
 ```text
 /avatar/{roleId}/midi
 ```
+
+### System Reset
+
+Address pattern:
+
+```text
+/system/resetall
+```
+
+Used by:
+
+- `AimapOscRouter.HandleResetAll()`
+- server admin reset command (`web-osc-controller-git/serverNew.js`)
+
+Behavior:
+
+- Resets skybox to scene `defaultSkyboxIndex`.
+- Sets all `AvatarSlotController` and `DancerSlotController` performance state to idle.
+- Clears dancer MIDI auto-trigger runtime timers/state.
 
 ### Dancer Move
 

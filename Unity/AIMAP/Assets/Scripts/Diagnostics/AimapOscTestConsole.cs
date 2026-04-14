@@ -147,6 +147,11 @@ namespace AIMAP.Diagnostics
                 SendInt("/environment/skybox", _skyboxIndex);
             }
 
+            if (GUILayout.Button("Reset All", GUILayout.Width(120f)))
+            {
+                SendInt("/system/resetall", 1);
+            }
+
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10f);

@@ -183,6 +183,7 @@ namespace AIMAP.Osc
                 }
 
                 receiver.Bind("/environment/skybox", message => HandleEnvironmentSkybox(listenPort, message));
+                receiver.Bind("/system/resetall", message => HandleResetAll(listenPort, message));
             }
         }
 
@@ -301,10 +302,39 @@ namespace AIMAP.Osc
             }
         }
 
+        private void SetAllAvatarPerformanceState(bool isPlaying)
+        {
+            if (avatarSlots == null)
+            {
+                return;
+            }
+
+            for (var index = 0; index < avatarSlots.Length; index++)
+            {
+                var slot = avatarSlots[index];
+                if (slot == null)
+                {
+                    continue;
+                }
+
+                slot.SetPerformanceState(isPlaying);
+            }
+        }
+
         private void HandleEnvironmentSkybox(int listenPort, OSCMessage message)
         {
             ReportMessage(listenPort, message);
             environmentController?.SetSkybox(ReadInt(message, 0));
+        }
+
+        private void HandleResetAll(int listenPort, OSCMessage message)
+        {
+            ReportMessage(listenPort, message);
+            environmentController?.ResetToDefaultSkybox();
+            SetAllAvatarPerformanceState(false);
+            SetAllDancerPerformanceState(false);
+            _dancersAutoPlaying = false;
+            _dancerAutoPlayUntilTime = -1f;
         }
 
         private void ReportMessage(int listenPort, OSCMessage message)

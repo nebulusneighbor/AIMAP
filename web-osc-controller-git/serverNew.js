@@ -262,6 +262,9 @@ io.on("connection", (socket) => {
         }
 
         if (data.command === "reset") {
+            const unityClient = new Client(oscTargets.unity.ip, oscTargets.unity.port);
+            unityClient.send('/system/resetall', 1, () => unityClient.close());
+
             appState.phase = "lobby";
             appState.round++;
             submissions = [];
