@@ -12,12 +12,18 @@ namespace AIMAP.Osc
     {
         [SerializeField] private OSCReceiver[] oscReceivers;
         [SerializeField] private AvatarSlotController[] avatarSlots;
+        [SerializeField] private DancerSlotController[] dancerSlots;
         [SerializeField] private SkyboxEnvironmentController environmentController;
         [SerializeField] private AimapOscDiagnostics diagnostics;
         [SerializeField] private AimapOscPortDebugPanel debugPanel;
+        [Header("Dancer Auto Trigger")]
+        [SerializeField] private bool autoTriggerDancersFromMidi = true;
+        [SerializeField, Min(0f)] private float dancerAutoStopDelaySeconds = 5f;
 
         [SerializeField] private readonly Dictionary<string, AimapAvatarMidiHandler> _midiHandlersByRole =
             new Dictionary<string, AimapAvatarMidiHandler>(StringComparer.OrdinalIgnoreCase);
+        private float _dancerAutoPlayUntilTime = -1f;
+        private bool _dancersAutoPlaying;
 
         private void Awake()
         {
@@ -45,6 +51,11 @@ namespace AIMAP.Osc
             {
                 avatarSlots = GetComponentsInChildren<AvatarSlotController>(true);
             }
+
+            if (dancerSlots == null || dancerSlots.Length == 0)
+            {
+                dancerSlots = GetComponentsInChildren<DancerSlotController>(true);
+            }
         }
 
         private void OnEnable()
@@ -54,6 +65,9 @@ namespace AIMAP.Osc
 
         private void OnDisable()
         {
+            _dancerAutoPlayUntilTime = -1f;
+            _dancersAutoPlaying = false;
+
             if (oscReceivers == null)
             {
                 return;
@@ -63,6 +77,23 @@ namespace AIMAP.Osc
             {
                 oscReceivers[i]?.ClearBinds();
             }
+        }
+
+        private void Update()
+        {
+            if (!autoTriggerDancersFromMidi)
+            {
+                return;
+            }
+
+            if (!_dancersAutoPlaying || Time.time < _dancerAutoPlayUntilTime)
+            {
+                return;
+            }
+
+            SetAllDancerPerformanceState(false);
+            _dancersAutoPlaying = false;
+            _dancerAutoPlayUntilTime = -1f;
         }
 
         private void BindAddresses()
@@ -95,43 +126,59 @@ namespace AIMAP.Osc
                             continue;
                         }
 
-                        var midiHandler = FindMidiHandler(slot);
-                        var roleId = midiHandler != null && !string.IsNullOrWhiteSpace(midiHandler.RoleId)
-                            ? midiHandler.RoleId
-                            : slot.RoleId;
-                        if (string.IsNullOrWhiteSpace(roleId))
+                        var canonicalRoleId = slot.RoleId;
+                        if (string.IsNullOrWhiteSpace(canonicalRoleId))
                         {
                             continue;
                         }
 
+                        var midiHandler = FindMidiHandler(slot);
                         if (midiHandler != null)
                         {
-                            var boundMidi = false;
+                            var midiRoleIds = new List<string>();
+                            AddDistinctRoleId(midiRoleIds, canonicalRoleId);
                             foreach (var oscMidiRole in midiHandler.OscRoleIds)
                             {
-                                if (string.IsNullOrWhiteSpace(oscMidiRole))
-                                {
-                                    continue;
-                                }
-
-                                boundMidi = true;
-                                _midiHandlersByRole[oscMidiRole] = midiHandler;
-                                var boundRole = oscMidiRole;
-                                receiver.Bind($"/avatar/{boundRole}/midi", message => HandleAvatarMidi(boundRole, listenPort, message));
+                                AddDistinctRoleId(midiRoleIds, oscMidiRole);
                             }
 
-                            if (!boundMidi)
+                            if (midiRoleIds.Count == 0)
                             {
-                                _midiHandlersByRole[roleId] = midiHandler;
-                                receiver.Bind($"/avatar/{roleId}/midi", message => HandleAvatarMidi(roleId, listenPort, message));
+                                continue;
+                            }
+
+                            for (var midiIndex = 0; midiIndex < midiRoleIds.Count; midiIndex++)
+                            {
+                                var boundRole = midiRoleIds[midiIndex];
+                                _midiHandlersByRole[boundRole] = midiHandler;
+                                var captureRole = boundRole;
+                                receiver.Bind($"/avatar/{captureRole}/midi", message => HandleAvatarMidi(captureRole, listenPort, message));
                             }
                         }
                         else
                         {
-                            receiver.Bind($"/avatar/{roleId}/state", message => HandleAvatarState(roleId, listenPort, message));
+                            receiver.Bind($"/avatar/{canonicalRoleId}/state", message => HandleAvatarState(canonicalRoleId, listenPort, message));
                         }
 
+                        receiver.Bind($"/avatar/{canonicalRoleId}/skin", message => HandleAvatarSkin(canonicalRoleId, listenPort, message));
+                        receiver.Bind($"/avatar/{canonicalRoleId}/move", message => HandleAvatarMove(canonicalRoleId, listenPort, message));
+                    }
+                }
+
+                if (dancerSlots != null)
+                {
+                    for (var index = 0; index < dancerSlots.Length; index++)
+                    {
+                        var slot = dancerSlots[index];
+                        if (slot == null || string.IsNullOrWhiteSpace(slot.RoleId))
+                        {
+                            continue;
+                        }
+
+                        var roleId = slot.RoleId;
+                        receiver.Bind($"/avatar/{roleId}/state", message => HandleAvatarState(roleId, listenPort, message));
                         receiver.Bind($"/avatar/{roleId}/skin", message => HandleAvatarSkin(roleId, listenPort, message));
+                        receiver.Bind($"/avatar/{roleId}/move", message => HandleAvatarMove(roleId, listenPort, message));
                     }
                 }
 
@@ -143,24 +190,50 @@ namespace AIMAP.Osc
         {
             ReportMessage(listenPort, message);
             var slot = FindSlot(roleId);
-            if (slot == null)
+            if (slot != null)
+            {
+                slot.SetPerformanceState(ReadBool(message, false));
+                return;
+            }
+
+            var dancerSlot = FindDancerSlot(roleId);
+            if (dancerSlot == null)
             {
                 return;
             }
 
-            slot.SetPerformanceState(ReadBool(message, false));
+            dancerSlot.SetPerformanceState(ReadBool(message, false));
         }
 
         private void HandleAvatarSkin(string roleId, int listenPort, OSCMessage message)
         {
             ReportMessage(listenPort, message);
             var slot = FindSlot(roleId);
-            if (slot == null)
+            if (slot != null)
+            {
+                slot.SetSkin(ReadInt(message, 0));
+                return;
+            }
+
+            var dancerSlot = FindDancerSlot(roleId);
+            if (dancerSlot == null)
             {
                 return;
             }
 
-            slot.SetSkin(ReadInt(message, 0));
+            dancerSlot.SetSkin(ReadInt(message, 0));
+        }
+
+        private void HandleAvatarMove(string roleId, int listenPort, OSCMessage message)
+        {
+            ReportMessage(listenPort, message);
+            var dancerSlot = FindDancerSlot(roleId);
+            if (dancerSlot == null)
+            {
+                return;
+            }
+
+            dancerSlot.SetDanceMove(ReadString(message, string.Empty));
         }
 
         private void HandleAvatarMidi(string roleId, int listenPort, OSCMessage message)
@@ -181,6 +254,7 @@ namespace AIMAP.Osc
             if (AimapAvatarMidiMessageDecoder.TryDecode(message, out var midiMessage))
             {
                 midiHandler.ApplyMidiMessage(midiMessage);
+                TryAutoTriggerDancersFromMidi(midiMessage);
                 return;
             }
 
@@ -188,6 +262,43 @@ namespace AIMAP.Osc
                 $"Failed to decode OSC MIDI message for role '{roleId}' at '{message?.Address}'. " +
                 "Expected [noteNumber], [noteNumber, velocity], [channel, noteNumber, velocity], or [noteState, channel, noteNumber, velocity].",
                 this);
+        }
+
+        private void TryAutoTriggerDancersFromMidi(AimapAvatarMidiMessage midiMessage)
+        {
+            if (!autoTriggerDancersFromMidi)
+            {
+                return;
+            }
+
+            _dancerAutoPlayUntilTime = Time.time + Mathf.Max(0f, dancerAutoStopDelaySeconds);
+
+            if (!midiMessage.IsNoteOn || midiMessage.Velocity <= 0)
+            {
+                return;
+            }
+
+            SetAllDancerPerformanceState(true);
+            _dancersAutoPlaying = true;
+        }
+
+        private void SetAllDancerPerformanceState(bool isPlaying)
+        {
+            if (dancerSlots == null)
+            {
+                return;
+            }
+
+            for (var index = 0; index < dancerSlots.Length; index++)
+            {
+                var slot = dancerSlots[index];
+                if (slot == null)
+                {
+                    continue;
+                }
+
+                slot.SetPerformanceState(isPlaying);
+            }
         }
 
         private void HandleEnvironmentSkybox(int listenPort, OSCMessage message)
@@ -247,6 +358,25 @@ namespace AIMAP.Osc
             };
         }
 
+        private static string ReadString(OSCMessage message, string fallback)
+        {
+            if (message == null || message.Values == null || message.Values.Count == 0)
+            {
+                return fallback;
+            }
+
+            var value = message.Values[0];
+            return value.Type switch
+            {
+                OSCValueType.String => value.StringValue,
+                OSCValueType.Int => value.IntValue.ToString(),
+                OSCValueType.Float => value.FloatValue.ToString(),
+                OSCValueType.True => "true",
+                OSCValueType.False => "false",
+                _ => fallback,
+            };
+        }
+
         private AvatarSlotController FindSlot(string roleId)
         {
             if (avatarSlots == null)
@@ -275,6 +405,49 @@ namespace AIMAP.Osc
             }
 
             return null;
+        }
+
+        private DancerSlotController FindDancerSlot(string roleId)
+        {
+            if (dancerSlots == null)
+            {
+                return null;
+            }
+
+            for (var index = 0; index < dancerSlots.Length; index++)
+            {
+                var slot = dancerSlots[index];
+                if (slot == null)
+                {
+                    continue;
+                }
+
+                if (string.Equals(slot.RoleId, roleId, StringComparison.OrdinalIgnoreCase))
+                {
+                    return slot;
+                }
+            }
+
+            return null;
+        }
+
+        private static void AddDistinctRoleId(List<string> roleIds, string candidate)
+        {
+            if (roleIds == null || string.IsNullOrWhiteSpace(candidate))
+            {
+                return;
+            }
+
+            var trimmed = candidate.Trim();
+            for (var i = 0; i < roleIds.Count; i++)
+            {
+                if (string.Equals(roleIds[i], trimmed, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+            }
+
+            roleIds.Add(trimmed);
         }
 
         private static AimapAvatarMidiHandler FindMidiHandler(AvatarSlotController slot)

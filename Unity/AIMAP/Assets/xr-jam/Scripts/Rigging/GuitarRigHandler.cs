@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Script to handle guitar animation
@@ -74,18 +75,16 @@ public class GuitarRigHandler : MonoBehaviour
             _leftTarget = _leftHandStartPos + _displacement * LeftHandPosition;
             _leftHandIK.transform.localPosition = Vector3.SmoothDamp(_leftHandIK.transform.localPosition, _leftTarget, ref _leftVelocity, _movementSpeed);
 
-            /*
-            //DEBUG ANIMATION
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                Strum(true);
-            }
+            // // DEBUG ANIMATION (New Input System)
+            // var keyboard = Keyboard.current;
+            // if (keyboard != null)
+            // {
+            //     if (keyboard.rKey.wasPressedThisFrame)
+            //         Strum(true);
+            //     if (keyboard.rKey.wasReleasedThisFrame)
+            //         Strum(false);
+            // }
 
-            if (Input.GetKeyUp(KeyCode.R))
-            {
-                Strum(false);
-            }
-            */
         }
     }
 

@@ -244,13 +244,17 @@ io.on("connection", (socket) => {
             unityClient.send('/environment/skybox', envMap[lastCalculatedResults.environment] || 0);
             unityClient.send('/avatar/dancer1/skin', getSkinIdx(lastCalculatedResults.dancers.d1.char));
             unityClient.send('/avatar/dancer2/skin', getSkinIdx(lastCalculatedResults.dancers.d2.char));
+            unityClient.send('/avatar/dancer1/state', 1);
+            unityClient.send('/avatar/dancer2/state', 1);
+            unityClient.send('/avatar/dancer1/move', lastCalculatedResults.dancers.d1.move || 'hiphop');
+            unityClient.send('/avatar/dancer2/move', lastCalculatedResults.dancers.d2.move || 'hiphop');
             
             const m = lastCalculatedResults.band.members;
             unityClient.send('/avatar/drum1/skin', getSkinIdx(m.drum1));
             unityClient.send('/avatar/drum2/skin', getSkinIdx(m.drum2));
             unityClient.send('/avatar/guitar/skin', getSkinIdx(m.guitar));
             unityClient.send('/avatar/bass/skin', getSkinIdx(m.bass));
-            unityClient.send('/avatar/violin/skin', getSkinIdx(m.strings));
+            unityClient.send('/avatar/strings/skin', getSkinIdx(m.strings));
 
             unityClient.close();
             console.log("Reverted to Separate Initiation Packets.");

@@ -20,7 +20,8 @@ namespace AIMAP.Diagnostics
             "drum2",
             "bass",
             "guitar",
-            "violin"
+            "strings",
+            "winds"
         };
         [SerializeField] private int midiNote = 60;
         [SerializeField] private int randomMidiCount = 8;

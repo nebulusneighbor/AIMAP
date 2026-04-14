@@ -14,6 +14,9 @@ namespace AIMAP.Avatars
             Keyboard = 1,
             Drums = 2,
             Guitar = 3,
+            Bass = 4,
+            Strings = 5,
+            Winds = 6,
         }
 
         [SerializeField] private string roleId;
@@ -61,6 +64,11 @@ namespace AIMAP.Avatars
 
         public float GuitarLeftHand { get; private set; }
         public bool ShouldStrum { get; private set; }
+
+        /// <summary>
+        /// True while there is at least one active note (bow should move) in strings mode.
+        /// </summary>
+        public bool StringsBowPlaying { get; private set; }
 
         public bool RightDrumHit { get; private set; }
         public bool LeftDrumHit { get; private set; }
@@ -195,6 +203,15 @@ namespace AIMAP.Avatars
                 case InstrumentRigMode.Guitar:
                     ProcessGuitar(midiMessage);
                     return;
+                case InstrumentRigMode.Bass:
+                    ProcessGuitar(midiMessage);
+                    return;
+                case InstrumentRigMode.Strings:
+                    ProcessStrings(midiMessage);
+                    return;
+                case InstrumentRigMode.Winds:
+                    ProcessKeyboard(midiMessage);
+                    return;
                 default:
                     ClearRigState();
                     return;
@@ -205,6 +222,7 @@ namespace AIMAP.Avatars
         {
             ClearDrumState();
             ClearGuitarState();
+            ClearStringsState();
 
             var leftNotes = 0;
             var rightNotes = 0;
@@ -262,6 +280,7 @@ namespace AIMAP.Avatars
         {
             ClearKeyboardState();
             ClearGuitarState();
+            ClearStringsState();
 
             if (midiMessage.Channel != 1)
             {
@@ -283,6 +302,7 @@ namespace AIMAP.Avatars
         {
             ClearKeyboardState();
             ClearDrumState();
+            ClearStringsState();
 
             var isPressed = false;
             var leftNote = 40;
@@ -304,11 +324,43 @@ namespace AIMAP.Avatars
             ShouldStrum = midiMessage.IsNoteOn && midiMessage.Velocity > 0;
         }
 
+        private void ProcessStrings(AimapAvatarMidiMessage midiMessage)
+        {
+            ClearKeyboardState();
+            ClearDrumState();
+            ClearGuitarState();
+
+            var isPressed = false;
+            var leftNote = 40;
+            for (var index = 0; index < _notes.Count; index++)
+            {
+                var note = _notes[index];
+                if (note.NoteChannel == 7 || note.NoteChannel == 1)
+                {
+                    isPressed = true;
+                    leftNote = note.NoteNumber;
+                }
+            }
+
+            if (isPressed)
+            {
+                GuitarLeftHand = Mathf.Clamp((leftNote - 40f) / 10f, 0f, 1f);
+            }
+
+            StringsBowPlaying = _notes.Count > 0;
+        }
+
         private void ClearRigState()
         {
             ClearKeyboardState();
             ClearDrumState();
             ClearGuitarState();
+            ClearStringsState();
+        }
+
+        private void ClearStringsState()
+        {
+            StringsBowPlaying = false;
         }
 
         private void ClearKeyboardState()

@@ -11,7 +11,7 @@ Both ports are bound by `AimapOscRouter`, and either port can receive the same s
 
 ## Role IDs
 
-The current osc test scene `Unity/AIMAP/Assets/Scenes/AIMAPVR_OscTest.unity` binds these role IDs:
+The main scene `Unity/AIMAP/Assets/Scenes/AIMAPVR.unity` binds these OSC-facing role IDs:
 
 - `dancer1`
 - `dancer2`
@@ -19,7 +19,9 @@ The current osc test scene `Unity/AIMAP/Assets/Scenes/AIMAPVR_OscTest.unity` bin
 - `drum2`
 - `bass`
 - `guitar`
-- `violin`
+- `strings`
+- `piano`
+- `winds`
 
 ## Router Rules
 
@@ -31,6 +33,11 @@ The current osc test scene `Unity/AIMAP/Assets/Scenes/AIMAPVR_OscTest.unity` bin
 - The router always binds `/environment/skybox`.
 
 Because of that, MIDI reception depends on the scene having an `AimapAvatarMidiHandler` for the target role.
+
+MIDI address binding (important for main `AIMAPVR`):
+
+- For each `AvatarSlotController` with a MIDI handler, the router binds **`/avatar/{slot.RoleId}/midi`** (canonical role, e.g. `guitar`, `piano`, `strings`, `winds`) **and** every ID from `AimapAvatarMidiHandler.OscRoleIds` (e.g. `guitar1`, `guitar2`). Send to either address; the same handler receives the message.
+- Skin uses the canonical **`slot.RoleId`** path only (e.g. `/avatar/guitar/skin`), matching typical web/server sends.
 
 Important discovery detail:
 
@@ -104,18 +111,28 @@ Address pattern:
 /avatar/{roleId}/midi
 ```
 
-##Need to update
-now each instrument has 2 midi value
-/avatar/{roleid}1/midi,41,48 etc
-one is note, one is vality
-animation can fit volicty
-instrument:
-Drums,piano,Gutairs,Bass,Strings,winds
-dacemove:
-Hippop,brakedance,latin,1lessdrink in address
-/avatar/dancer1/move -> just for dancing pattern
-Once any osc message is sending to the headset, start dancing and stop after 5 sceonds
-Standing will be better
+### Dancer Move
+
+Address pattern:
+
+```text
+/avatar/{roleId}/move
+```
+
+Used by:
+
+- `AimapOscRouter.HandleAvatarMove()`
+- `DancerSlotController.SetDanceMove()`
+
+Notes:
+
+- Use canonical dancer role IDs only: `dancer1` and `dancer2`.
+- Typical move values are `hiphop`, `breakdance`, `latin`, `drink`.
+- In the scene, `DancerSlotController.activeStateName` must name a **dance** animator state, not the same as `idleStateName`. If both were identical (e.g. `listen2`), “play” never left idle and clips looked frozen.
+- `moveMappings` should include those OSC strings (e.g. `hiphop` to state `hippop`) so `/move` matches the controller state names.
+- Dancers start in idle. They can enter active dance either from:
+  - explicit state OSC (`/avatar/dancer1/state [1]`, `/avatar/dancer2/state [1]`), or
+   - auto-trigger on MIDI note-on with velocity above zero; **any** decoded MIDI on a band slot resets the silence timer; after `dancerAutoStopDelaySeconds` (default 5 seconds) with no further MIDI, dancers return to idle.
 
 Used by:
 
@@ -190,6 +207,9 @@ Examples:
 - `1`: Keyboard
 - `2`: Drums
 - `3`: Guitar
+- `4`: Bass
+- `5`: Strings
+- `6`: Winds
 
 Behavior notes:
 
@@ -201,11 +221,11 @@ Behavior notes:
 
 ## Test Scene Notes
 
-For the built-in osc test scene:
+For the built-in osc test scene (`AIMAPVR_OscTest.unity`):
 
 - The test console sends MIDI to `/avatar/{roleId}/midi`.
 - The test console now sends the one-value MIDI payload format: `[noteNumber]`.
-- The saved test scene now has `AimapAvatarMidiHandler` components on all test roles, so the original router will bind MIDI addresses there.
+- The saved test scene has `AimapAvatarMidiHandler` on band roles (`drum1`, `drum2`, `bass`, `guitar`, `strings`, `winds`), dancers (`dancer1`, `dancer2` with `DancerSlotController` for `/move`), so the router binds state, skin, MIDI, and dancer move as documented.
 - The saved test scene transmitter target host is set to the Quest device IP `10.0.0.124`.
 - The main `AIMAPVR` scene may need handlers on the slot hierarchy rather than only on the named avatar object if you want the router to bind MIDI there.
 
@@ -215,7 +235,7 @@ If MIDI still does not react:
 
 1. Confirm you are sending to the same port the receiver is listening on: `11003` or `2348`.
 2. Confirm the OSC address exactly matches `/avatar/{roleId}/midi`.
-3. Confirm the role ID exactly matches the scene binding, for example `violin` not `Violin`.
+3. Confirm the role ID exactly matches the scene binding, for example `strings` not `Strings`.
 4. Confirm the payload is one of `[noteNumber]`, `[noteNumber, velocity]`, `[channel, noteNumber, velocity]`, or `[noteState, channel, noteNumber, velocity]`.
 5. Check the Unity Console for the router warning about failed MIDI decode.
 6. Check that the scene object for that role actually has an `AimapAvatarMidiHandler`.

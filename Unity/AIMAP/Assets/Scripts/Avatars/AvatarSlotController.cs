@@ -17,6 +17,15 @@ namespace AIMAP.Avatars
         public Vector3 localScale = Vector3.one;
     }
 
+    [Serializable]
+    public sealed class AvatarSkinMaterialSet
+    {
+        [Tooltip("Family index mapping (0=robots, 1=aliens, 2=monsters).")]
+        public int familyIndex;
+        [Tooltip("Materials to apply by renderer slot order.")]
+        public Material[] materials;
+    }
+
     public sealed class AvatarSlotController : MonoBehaviour
     {
         [SerializeField] private string roleId;
@@ -27,6 +36,14 @@ namespace AIMAP.Avatars
         [SerializeField] private GameObject fallbackPrefab;
         [SerializeField] private List<AvatarSkinVariant> skinVariants = new List<AvatarSkinVariant>();
         [SerializeField] private bool bindOnStart = true;
+        [Header("Skin application")]
+        [Tooltip("When enabled, SetSkin updates materials on the current avatar instead of swapping avatar prefabs.")]
+        [SerializeField] private bool useMaterialSkinOnly = true;
+        [Tooltip("Per-avatar material sets for skin families (0=robots, 1=aliens, 2=monsters).")]
+        [SerializeField] private List<AvatarSkinMaterialSet> skinMaterialSets = new List<AvatarSkinMaterialSet>();
+        [Tooltip("Renderer name filter for material-only skinning. 'alpha_surface' targets only those meshes; leave empty to affect all renderers.")]
+        [SerializeField] private string materialSkinRendererNameFilter = "alpha_surface";
+        [Tooltip("Initial skin family index (server mapping: 0=robots, 1=aliens, 2=monsters).")]
         [SerializeField] private int defaultFamilyIndex;
 
         private GameObject _defaultRoot;
@@ -116,11 +133,23 @@ namespace AIMAP.Avatars
             _diagnostics?.RegisterStateChange(roleId, isPlaying);
         }
 
-        public void SetSkin(int skinIndex)
+        /// <summary>
+        /// Switches the visible avatar prefab by family index (server mapping: 0=robots, 1=aliens, 2=monsters).
+        /// If there is no variant for the requested family, falls back to the default root.
+        /// </summary>
+        public void SetSkin(int familyIndex)
         {
             Bind();
 
-            _currentSkinIndex = Mathf.Max(0, skinIndex);
+            _currentSkinIndex = Mathf.Max(0, familyIndex);
+
+            if (useMaterialSkinOnly)
+            {
+                ApplyMaterialSkin(_activeRoot != null ? _activeRoot : _defaultRoot, _currentSkinIndex);
+                _diagnostics?.RegisterSkinChange(roleId, _currentSkinIndex);
+                return;
+            }
+
             var variant = GetVariantForFamily(_currentSkinIndex);
 
             if (variant == null)
@@ -139,9 +168,103 @@ namespace AIMAP.Avatars
             _diagnostics?.RegisterSkinChange(roleId, _currentSkinIndex);
         }
 
+        private void ApplyMaterialSkin(GameObject root, int familyIndex)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
+            var renderers = root.GetComponentsInChildren<Renderer>(true);
+            if (renderers == null || renderers.Length == 0)
+            {
+                return;
+            }
+
+            var palette = GetFamilyPalette(familyIndex);
+            var hasPalette = palette != null && palette.Length > 0;
+            Material[] materialsFromLibrary = null;
+            var hasLibraryMaterials = TryGetMaterialSet(familyIndex, out materialsFromLibrary);
+
+            if (!hasPalette && !hasLibraryMaterials)
+            {
+                return;
+            }
+
+            var paletteOffset = hasPalette ? GetStableVariantIndex(familyIndex + 100, palette.Length) : 0;
+            var hasFilter = !string.IsNullOrWhiteSpace(materialSkinRendererNameFilter);
+
+            for (var rendererIndex = 0; rendererIndex < renderers.Length; rendererIndex++)
+            {
+                var renderer = renderers[rendererIndex];
+                if (renderer == null)
+                {
+                    continue;
+                }
+
+                if (hasFilter
+                    && renderer.name.IndexOf(materialSkinRendererNameFilter, StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    continue;
+                }
+
+                // Intentionally uses material instances so each avatar role can keep independent colors.
+                var materials = renderer.materials;
+                for (var materialIndex = 0; materialIndex < materials.Length; materialIndex++)
+                {
+                    var material = materials[materialIndex];
+                    if (material == null)
+                    {
+                        continue;
+                    }
+
+                    if (hasLibraryMaterials)
+                    {
+                        var mappedMaterial = materialsFromLibrary[Mathf.Min(materialIndex, materialsFromLibrary.Length - 1)];
+                        if (mappedMaterial != null)
+                        {
+                            materials[materialIndex] = mappedMaterial;
+                            continue;
+                        }
+                    }
+
+                    if (hasPalette)
+                    {
+                        var color = palette[(paletteOffset + materialIndex) % palette.Length];
+                        SetMaterialColor(material, color);
+                    }
+                }
+
+                if (hasLibraryMaterials)
+                {
+                    renderer.materials = materials;
+                }
+            }
+        }
+
+        private bool TryGetMaterialSet(int familyIndex, out Material[] materials)
+        {
+            if (skinMaterialSets != null)
+            {
+                for (var index = 0; index < skinMaterialSets.Count; index++)
+                {
+                    var set = skinMaterialSets[index];
+                    if (set != null && set.familyIndex == familyIndex && set.materials != null && set.materials.Length > 0)
+                    {
+                        materials = set.materials;
+                        return true;
+                    }
+                }
+            }
+
+            materials = null;
+            return false;
+        }
+
         private AvatarSkinVariant GetVariantForFamily(int requestedFamilyIndex)
         {
-            if (requestedFamilyIndex <= 0)
+            // Accept family index 0 as valid so it matches server mapping (0=robots).
+            if (requestedFamilyIndex < 0)
             {
                 return null;
             }
@@ -336,6 +459,13 @@ namespace AIMAP.Avatars
         {
             return familyIndex switch
             {
+                0 => new[]
+                {
+                    new Color(0.76f, 0.79f, 0.86f),
+                    new Color(0.45f, 0.49f, 0.56f),
+                    new Color(0.58f, 0.62f, 0.70f),
+                    new Color(0.31f, 0.35f, 0.43f),
+                },
                 1 => new[]
                 {
                     new Color(0.36f, 0.78f, 0.52f),

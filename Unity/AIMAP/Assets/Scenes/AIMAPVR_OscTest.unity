@@ -315,7 +315,7 @@ GameObject:
   - component: {fileID: 382729934}
   - component: {fileID: 382729935}
   m_Layer: 0
-  m_Name: violin_Slot
+  m_Name: strings_Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -348,11 +348,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
-  roleId: violin
+  roleId: strings
   targetAvatarName: 
   roleController: {fileID: 0}
   idleStateName: listen
-  activeStateName: violin
+  activeStateName: strings
   fallbackPrefab: {fileID: 0}
   skinVariants: []
   bindOnStart: 1
@@ -369,9 +369,80 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
-  roleId: violin
-  instrumentMode: 3
+  roleId: strings
+  instrumentMode: 5
   avatarSlot: {fileID: 382729934}
+  instrumentRigManager: {fileID: 0}
+  driveAvatarPerformanceState: 1
+--- !u!1 &282729940
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 282729941}
+  - component: {fileID: 282729942}
+  - component: {fileID: 282729943}
+  m_Layer: 0
+  m_Name: winds_Slot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &282729941
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282729940}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2, y: 0, z: 4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 627940667}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &282729942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282729940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d352fa818a18431d972862264fa286f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AvatarSlotController
+  roleId: winds
+  targetAvatarName: 
+  roleController: {fileID: 0}
+  idleStateName: listen
+  activeStateName: winds
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
+  bindOnStart: 1
+  defaultFamilyIndex: 0
+--- !u!114 &282729943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282729940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e1258873f6e4ec0b988c421f9ac57d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.AimapAvatarMidiHandler
+  roleId: winds
+  instrumentMode: 6
+  avatarSlot: {fileID: 282729942}
   instrumentRigManager: {fileID: 0}
   driveAvatarPerformanceState: 1
 --- !u!1 &500378399
@@ -546,7 +617,8 @@ MonoBehaviour:
   - drum2
   - bass
   - guitar
-  - violin
+  - strings
+  - winds
   midiNote: 60
   randomMidiCount: 8
   randomMidiNoteRange: {x: 48, y: 72}
@@ -668,6 +740,7 @@ Transform:
   - {fileID: 1283528484}
   - {fileID: 1056764577}
   - {fileID: 382729933}
+  - {fileID: 282729941}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &627940668
@@ -700,6 +773,7 @@ GameObject:
   - component: {fileID: 900499089}
   - component: {fileID: 900499090}
   - component: {fileID: 900499091}
+  - component: {fileID: 900499092}
   m_Layer: 0
   m_Name: dancer2_Slot
   m_TagString: Untagged
@@ -760,6 +834,28 @@ MonoBehaviour:
   avatarSlot: {fileID: 900499090}
   instrumentRigManager: {fileID: 0}
   driveAvatarPerformanceState: 1
+--- !u!114 &900499092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900499088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab7ca68279f3e41b288a5ecc9f1c171c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.DancerSlotController
+  roleId: dancer2
+  targetAvatarName: 
+  roleController: {fileID: 0}
+  idleStateName: listen2
+  activeStateName: salsa
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
+  bindOnStart: 1
+  defaultFamilyIndex: 0
+  moveMappings: []
 --- !u!1 &1056764576
 GameObject:
   m_ObjectHideFlags: 0
@@ -1112,6 +1208,7 @@ GameObject:
   - component: {fileID: 1901115146}
   - component: {fileID: 1901115147}
   - component: {fileID: 1901115148}
+  - component: {fileID: 1901115149}
   m_Layer: 0
   m_Name: dancer1_Slot
   m_TagString: Untagged
@@ -1172,6 +1269,28 @@ MonoBehaviour:
   avatarSlot: {fileID: 1901115147}
   instrumentRigManager: {fileID: 0}
   driveAvatarPerformanceState: 1
+--- !u!114 &1901115149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901115145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab7ca68279f3e41b288a5ecc9f1c171c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIMAP.Avatars.DancerSlotController
+  roleId: dancer1
+  targetAvatarName: 
+  roleController: {fileID: 0}
+  idleStateName: listen2
+  activeStateName: hippop
+  fallbackPrefab: {fileID: 0}
+  skinVariants: []
+  bindOnStart: 1
+  defaultFamilyIndex: 0
+  moveMappings: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
