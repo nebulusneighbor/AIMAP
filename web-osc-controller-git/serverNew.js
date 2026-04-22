@@ -4,11 +4,77 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { Client } = require('node-osc');
 
+const fs = require('fs');
+const path = require('path');
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
 const PORT = 3000;
+
+/* ---------- DATA LOGGING SYSTEM ---------- */
+class CSVLogger {
+    constructor() {
+        const now = new Date();
+        const timestamp = now.toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/:/g, '-');
+        this.sessionDir = path.join(__dirname, 'logs', timestamp);
+        this.participantDir = path.join(this.sessionDir, 'individual_participant_logs');
+        
+        // Ensure directories exist
+        if (!fs.existsSync(path.join(__dirname, 'logs'))) fs.mkdirSync(path.join(__dirname, 'logs'));
+        fs.mkdirSync(this.sessionDir);
+        fs.mkdirSync(this.participantDir);
+        
+        console.log(`[LOGGER] Session logs initialized at: ${this.sessionDir}`);
+    }
+
+    formatCSVRow(data, headers) {
+        return headers.map(key => {
+            const val = data[key];
+            const str = (val === null || val === undefined) ? "" : (typeof val === 'object' ? JSON.stringify(val) : String(val));
+            return `"${str.replace(/"/g, '""')}"`; // Escape quotes
+        }).join(',');
+    }
+
+    logEvent(filename, data, useParticipantDir = false, schema = null) {
+        const timestamp = new Date().toISOString();
+        const dir = useParticipantDir ? this.participantDir : this.sessionDir;
+        const filePath = path.join(dir, filename.endsWith('.csv') ? filename : `${filename}.csv`);
+        
+        let headers = [];
+        let rowData = { timestamp, ...data };
+
+        if (schema) {
+            // STRICT SCHEMA: Header order is defined by SUBMISSION_SCHEMA
+            headers = ['timestamp', ...schema];
+        } else {
+            // DYNAMIC: Headers are whatever keys are present
+            headers = Object.keys(rowData);
+        }
+        
+        const isNewFile = !fs.existsSync(filePath);
+        if (isNewFile) {
+            fs.writeFileSync(filePath, headers.join(',') + '\n');
+        }
+
+        const row = this.formatCSVRow(rowData, headers);
+        fs.appendFileSync(filePath, row + '\n');
+    }
+}
+
+const logger = new CSVLogger();
+
+// MASTER SCHEMA for Submissions (ensures CSV alignment)
+const SUBMISSION_SCHEMA = [
+    'username', 'submitted_at', 'seconds_to_submit', 'total_choices_made',
+    'genre', 'tempo', 'mode', 'human_guitar_tone',
+    'instruments', 'guitar_fx_choice', 'bass_fx_choice', 'piano_fx_choice', 'strings_fx_choice', 'winds_fx_choice',
+    'environment', 'd1_character', 'd1_move', 'd2_character', 'd2_move',
+    'drum1_char', 'drum2_char', 'guitar_char', 'bass_char', 'piano_char', 'strings_char', 'winds_char'
+];
+
+/* ----------------------------------------- */
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,7 +98,8 @@ let lastCalculatedResults = null;
 let appState = {
     phase: "lobby", // lobby, active, results
     mode: "both",   // audio, visual, both
-    round: 1        // Incrementing this effectively resets all users
+    round: 1,        // Incrementing this effectively resets all users
+    round_start_time: null
 };
 
 let oscTargets = {
@@ -70,8 +137,16 @@ const getWeightedRandom = (arr, weights) => {
 function calculateAverages(mode) {
     const fxList = ["guitar", "bass", "piano", "strings", "winds"];
     const members = ["drum1", "drum2", "guitar", "bass", "piano", "strings", "winds"];
-    const fxChoices = ["piano_fx_choice", "guitar_fx_choice", "bass_fx_choice", "strings_fx_choice", "winds_fx_choice"];
+    const fxChoiceNames = ["piano_fx_choice", "guitar_fx_choice", "bass_fx_choice", "strings_fx_choice", "winds_fx_choice"];
     const chars = ['vampire', 'werewolf', 'moose_orc', 'goblin_elf', 'flesh_eater', 'dark_noire', 'lizard_species', 'webbed_and_armored', 'x-bot', 'y-bot'];
+    const feelMap = ['drive/rock', 'pulse/hiphop', 'groove/funky', 'elegant/atmospheric'];
+    const danceMoves = ['hiphop', 'breakdance', 'latin', 'drink'];
+    const envOptions = ['haunted forest', 'mars scape', 'laser grid'];
+    const fxChoiceMap = {
+        piano: ['default', 'dist', 'echo'], guitar: ['default', 'dist', 'airy'],
+        bass: ['default', 'dist', 'reverb'], strings: ['default', 'dist', 'chorus'],
+        winds: ['default', 'dist', 'phaser']
+    };
 
     const summary = {
         count: submissions.length,
@@ -91,7 +166,7 @@ function calculateAverages(mode) {
         }
     };
 
-    fxChoices.forEach(fc => summary.fx_choices[fc] = {});
+    fxChoiceNames.forEach(fc => summary.fx_choices[fc] = {});
 
     submissions.forEach(s => {
         summary.tempo += parseInt(s.tempo || 115);
@@ -107,7 +182,7 @@ function calculateAverages(mode) {
             } catch(e) {}
         }
 
-        fxChoices.forEach(fc => {
+        fxChoiceNames.forEach(fc => {
             const val = s[fc] || "none";
             summary.fx_choices[fc][val] = (summary.fx_choices[fc][val] || 0) + 1;
         });
@@ -147,68 +222,94 @@ function calculateAverages(mode) {
             d1: { char: getTop(summary.dancers.d1_char), move: getTop(summary.dancers.d1_move) },
             d2: { char: getTop(summary.dancers.d2_char), move: getTop(summary.dancers.d2_move) }
         },
-        band: { members: {} },
-        // Distro data for charts
-        distributions: {
-            genre: summary.genre,
-            mode: summary.mode,
-            environment: summary.environment,
-            tone: summary.human_guitar_tone,
-            fx: summary.fx_choices,
-            d1_move: summary.dancers.d1_move,
-            d2_move: summary.dancers.d2_move,
-            band: summary.band
-        }
+        band: { members: {} }
     };
 
-    fxChoices.forEach(fc => {
+    fxChoiceNames.forEach(fc => {
         final.fx_choices[fc.replace("_fx_choice", "")] = getTop(summary.fx_choices[fc]);
     });
     members.forEach(m => final.band.members[m] = getTop(summary.band[m]));
 
-    // AI Generation for excluded modes OR empty submissions
-    if (mode === 'audio' || summary.count === 0) {
-        if (!final.environment) final.environment = getRandom(['haunted forest', 'mars scape', 'laser grid']);
-        if (!final.dancers.d1.char) final.dancers.d1.char = getRandom(chars);
-        if (!final.dancers.d1.move) final.dancers.d1.move = getRandom(['hiphop', 'breakdance', 'latin', 'drink']);
-        if (!final.dancers.d2.char) final.dancers.d2.char = getRandom(chars);
-        if (!final.dancers.d2.move) final.dancers.d2.move = getRandom(['hiphop', 'breakdance', 'latin', 'drink']);
-        
-        members.forEach(m => {
-            if (!final.band.members[m]) final.band.members[m] = getRandom(chars);
+    // AI Generation for any missing core variables
+    const effectiveCount = Math.max(summary.count, 1);
+
+    if (!final.genre) {
+        final.ai_audio = true;
+        final.genre = getRandom(feelMap);
+        summary.genre[final.genre] = effectiveCount;
+    }
+    if (!final.mode_val) {
+        final.ai_audio = true;
+        final.mode_val = getRandom(['major', 'minor']);
+        summary.mode[final.mode_val] = effectiveCount;
+    }
+    if (!final.humanGuitarTone) {
+        final.ai_audio = true;
+        final.humanGuitarTone = getRandom(['1', '2', '3']);
+        summary.human_guitar_tone[final.humanGuitarTone] = effectiveCount;
+    }
+    if (summary.tempo === 0 || !final.tempo) {
+        final.ai_audio = true;
+        final.tempo = Math.floor(Math.random() * (140 - 90 + 1)) + 90;
+    }
+
+    // Random instrument mix if none voted
+    if (Object.values(final.instruments).every(v => v === 0)) {
+        final.ai_instruments = true;
+        fxList.forEach(inst => { 
+            if (Math.random() > 0.4) {
+                final.instruments[inst] = effectiveCount;
+                summary.instruments[inst] = effectiveCount;
+            }
         });
-        
-        final.ai_visual = true;
     }
 
-    if (mode === 'visual' || summary.count === 0) {
-        if (!final.genre || final.genre === 'visual') {
-            const feelMap = ['drive/rock', 'pulse/hiphop', 'groove/funky', 'elegant/atmospheric'];
-            final.ai_audio = true;
-            final.genre = getRandom(feelMap);
-            final.mode_val = getRandom(['major', 'minor']);
-            final.humanGuitarTone = getRandom(['1', '2', '3']);
-            final.tempo = Math.floor(Math.random() * (140 - 90 + 1)) + 90;
-            
-            // Explicitly ensure instrument mix is randomized
-            const count = summary.count || 1;
-            fxList.forEach(inst => { 
-                if (Math.random() > 0.4) final.instruments[inst] = count; 
-                else final.instruments[inst] = 0;
-            });
-
-            // FX Choices AI
-            const fxChoiceMap = {
-                piano: ['default', 'dist', 'echo'], guitar: ['default', 'dist', 'airy'],
-                bass: ['default', 'dist', 'reverb'], strings: ['default', 'dist', 'chorus'],
-                winds: ['default', 'dist', 'phaser']
-            };
-            const weights = [3, 1, 1]; // 'default' is 3x more likely
-            Object.keys(fxChoiceMap).forEach(inst => {
-                final.fx_choices[inst] = getWeightedRandom(fxChoiceMap[inst], weights);
-            });
+    // FX Choices AI Weighted (3x for Default)
+    const weights = [3, 1, 1];
+    Object.keys(fxChoiceMap).forEach(inst => {
+        if (!final.fx_choices[inst] || final.fx_choices[inst] === "none" || final.fx_choices[inst] === null) {
+            final.fx_choices[inst] = getWeightedRandom(fxChoiceMap[inst], weights);
+            if (!summary.fx_choices[`${inst}_fx_choice`]) summary.fx_choices[`${inst}_fx_choice`] = {};
+            summary.fx_choices[`${inst}_fx_choice`][final.fx_choices[inst]] = effectiveCount;
         }
+    });
+
+    if (!final.environment) {
+        final.ai_visual = true;
+        final.environment = getRandom(envOptions);
+        summary.environment[final.environment] = effectiveCount;
     }
+    if (!final.dancers.d1.char) final.dancers.d1.char = getRandom(chars);
+    if (!final.dancers.d1.move) {
+        final.dancers.d1.move = getRandom(danceMoves);
+        if (!summary.dancers.d1_move) summary.dancers.d1_move = {};
+        summary.dancers.d1_move[final.dancers.d1.move] = effectiveCount;
+    }
+    if (!final.dancers.d2.char) final.dancers.d2.char = getRandom(chars);
+    if (!final.dancers.d2.move) {
+        final.dancers.d2.move = getRandom(danceMoves);
+        if (!summary.dancers.d2_move) summary.dancers.d2_move = {};
+        summary.dancers.d2_move[final.dancers.d2.move] = effectiveCount;
+    }
+    
+    members.forEach(m => {
+        if (!final.band.members[m]) {
+            final.band.members[m] = getRandom(chars);
+            summary.band[m][final.band.members[m]] = effectiveCount;
+        }
+    });
+
+    // Final distributions for charts
+    final.distributions = {
+        genre: summary.genre,
+        mode: summary.mode,
+        environment: summary.environment,
+        tone: summary.human_guitar_tone,
+        fx: summary.fx_choices,
+        d1_move: summary.dancers.d1_move,
+        d2_move: summary.dancers.d2_move,
+        band: summary.band
+    };
 
     return final;
 }
@@ -235,9 +336,45 @@ app.get('/aggregator', (req, res) => {
 
 app.post('/submit', (req, res) => {
     if (req.session.lastSubmittedRound === appState.round) return res.redirect("/");
-    submissions.push(req.body);
+    
+    const now = Date.now();
+    const durationSeconds = appState.round_start_time ? (now - appState.round_start_time) / 1000 : 0;
+
+    // Calculate choices made (Interaction Depth)
+    let choicesMade = 0;
+    for (let key in req.body) {
+        if (key === 'instruments') {
+            try {
+                const inst = JSON.parse(req.body[key]);
+                choicesMade += Object.keys(inst).length;
+            } catch(e) {}
+        } else {
+            const val = req.body[key];
+            // Only count if it's a valid, non-default, non-empty selection
+            if (val && val !== "" && val !== "default" && val !== "none") {
+                // If it's tempo, only count if it's not the default value (115)
+                if (key === 'tempo' && val === "115") continue;
+                choicesMade++;
+            }
+        }
+    }
+
+    const submission = { 
+        ...req.body, 
+        username: req.session.username,
+        submitted_at: new Date().toISOString(),
+        seconds_to_submit: durationSeconds.toFixed(2),
+        total_choices_made: choicesMade
+    };
+    
+    submissions.push(submission);
     req.session.lastSubmittedRound = appState.round;
     globalClickCount++;
+
+    // LOG SUBMISSION (STRICT SCHEMA)
+    logger.logEvent('submissions', submission, false, SUBMISSION_SCHEMA);
+    logger.logEvent(`user_${req.session.username}`, submission, true, SUBMISSION_SCHEMA);
+
     io.emit("aggregator_update", { 
         count: globalClickCount,
         username: req.session.username 
@@ -255,9 +392,13 @@ io.on("connection", (socket) => {
     }
 
     socket.on("admin_command", (data) => {
+        // LOG ADMIN ACTION
+        logger.logEvent('admin_actions', data);
+
         if (data.command === "start_vote") {
             appState.phase = "active";
             appState.mode = data.mode;
+            appState.round_start_time = Date.now(); // TRACK START OF ROUND
             submissions = [];
             globalClickCount = 0;
             io.emit("phase_change", appState);
@@ -269,6 +410,9 @@ io.on("connection", (socket) => {
             const results = calculateAverages(appState.mode);
             if (results) {
                 lastCalculatedResults = results;
+                
+                // LOG FINAL AGGREGATED RESULTS
+                logger.logEvent('final_results', { round: appState.round, ...results });
             }
             io.emit("results_ready", results);
         }
@@ -395,6 +539,9 @@ app.post('/set-username', (req, res) => {
     if (username && username.trim() !== "") {
         req.session.username = username.trim();
         req.session.lastSubmittedRound = 0;
+        
+        // LOG LOGIN
+        logger.logEvent('logins', { username: req.session.username, action: 'login' });
     }
     res.redirect("/");
 });

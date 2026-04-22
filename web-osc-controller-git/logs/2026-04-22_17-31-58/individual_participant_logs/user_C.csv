@@ -1,0 +1,4 @@
+timestamp,username,submitted_at,seconds_to_submit,total_choices_made,genre,tempo,mode,human_guitar_tone,instruments,guitar_fx_choice,bass_fx_choice,piano_fx_choice,strings_fx_choice,winds_fx_choice,environment,d1_character,d1_move,d2_character,d2_move,drum1_char,drum2_char,guitar_char,bass_char,piano_char,strings_char,winds_char
+"2026-04-22T17:34:46.556Z","C","2026-04-22T17:34:46.555Z","161.95","6","drive/rock","115","minor","","{""piano"":true}","","","","","","haunted forest","","","","","lizard_species","","","moose_orc","","",""
+"2026-04-22T17:36:37.260Z","C","2026-04-22T17:36:37.259Z","13.56","1","","115","","","{""strings"":true}","","","","","","","","","","","","","","","","",""
+"2026-04-22T17:38:17.750Z","C","2026-04-22T17:38:17.749Z","16.37","2","","","","","","","","","","","","flesh_eater","breakdance","","","","","","","","",""

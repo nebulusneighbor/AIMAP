@@ -1,0 +1,4 @@
+timestamp,command,mode,abletonIP,unityIP
+"2026-04-22T18:47:25.290Z","start_vote","both","127.0.0.1","127.0.0.1"
+"2026-04-22T18:47:48.131Z","lock_and_average","both","127.0.0.1","127.0.0.1"
+"2026-04-22T18:48:04.813Z","initiate_performance","both","127.0.0.1","127.0.0.1"

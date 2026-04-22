@@ -1,0 +1,5 @@
+timestamp,genre,mode,tempo,human_guitar_tone,guitar_fx_choice,bass_fx_choice,piano_fx_choice,strings_fx_choice,winds_fx_choice,instruments,environment,d1_character,d1_move,d2_character,d2_move,drum1_char,drum2_char,guitar_char,bass_char,piano_char,strings_char,winds_char,username,submitted_at,seconds_to_submit,total_choices_made
+"2026-04-22T17:10:08.700Z","","","115","","dist","","","","","{""guitar"":true}","","werewolf","","goblin_elf","","","","","lizard_species","","","","Cell","2026-04-22T17:10:08.700Z","36.18","5"
+"2026-04-22T17:10:11.487Z","","","115","2","dist","","","","","{""guitar"":true}","","","","","","","","","","","","","a","2026-04-22T17:10:11.487Z","38.96","3"
+"2026-04-22T17:12:59.101Z","drive/rock","128","minor","3","airy","","default","dist","","{""guitar"":true,""piano"":true,""strings"":true}","a","2026-04-22T17:12:59.101Z","27.77","9"
+"2026-04-22T17:13:01.086Z","groove/funky","115","major","","dist","","","","","{""guitar"":true}","Cell","2026-04-22T17:13:01.086Z","29.75","4"
