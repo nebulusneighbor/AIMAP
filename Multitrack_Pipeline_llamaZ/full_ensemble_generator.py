@@ -234,7 +234,32 @@ def generate_z_ensemble(genre, target_progs, auto_fire=True, session_seed_mid=No
             break
 
     # Final combined sequence
-    generated_tokens = header_tokens + body_tokens
+    # header_tokens: [genre, i-X, i-Y...]
+    # body_tokens:   [i-X, o-X, p-X, d-X, b-1, i-Y, o-Y...]
+    
+    # STRICT FILTER: Ensure only target_progs instruments (and drums if applicable) are in the body
+    allowed_progs = set(target_progs)
+    if is_drum_seed:
+        allowed_progs.add(128)
+
+    filtered_body = []
+    current_inst_allowed = False
+    for tok in body_tokens:
+        if tok.startswith("i-"):
+            try:
+                prog = int(tok.split("-")[1])
+                current_inst_allowed = (prog in allowed_progs)
+                if current_inst_allowed:
+                    filtered_body.append(tok)
+            except:
+                current_inst_allowed = False
+        elif tok == "b-1":
+            filtered_body.append(tok)
+        else:
+            if current_inst_allowed:
+                filtered_body.append(tok)
+                
+    generated_tokens = header_tokens + filtered_body
 
     # 4. Save and Send
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -270,7 +295,7 @@ def osc_handler(address, *args):
             try: target_progs.append(int(val))
             except: pass
     
-    if not target_progs: target_progs = [128, 0, 24, 33, 48, 73]
+    # Removed fallback to full ensemble here
     
     if genre not in GENRES:
         found = False
@@ -317,7 +342,10 @@ def drum_seeded_handler(address, *args):
     if not args: return
     genre = str(args[0])
     target_progs = []
+    # If no instrument IDs were sent, the band is empty (only drums)
+    has_explicit_progs = False
     for val in args[1:]:
+        has_explicit_progs = True
         if isinstance(val, (list, tuple)):
             for v in val:
                 try: target_progs.append(int(v))
@@ -326,7 +354,10 @@ def drum_seeded_handler(address, *args):
             try: target_progs.append(int(val))
             except: pass
             
-    if not target_progs: target_progs = [128, 0, 24, 33, 48, 73]
+    # FALLBACK: Only use default ensemble if the message had NO instrument arguments at all (legacy trigger)
+    # If the message had arguments but they resulted in an empty list, it means the ensemble is intentionally empty.
+    if not has_explicit_progs and not target_progs: 
+        target_progs = [128, 0, 24, 33, 48, 73]
     
     if genre not in GENRES:
         found = False
@@ -380,7 +411,6 @@ def drum_seeded_handler(address, *args):
                     print(f"[Z-GROOVE] Error: {e}")
                 time.sleep(1)
         threading.Thread(target=run_batch).start()
-
 
 def zero_shot_handler(address, *args):
     if not args: return
