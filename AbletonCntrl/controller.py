@@ -33,6 +33,7 @@ staged_clips_map = {}
 local_slot_cache = {}
 session_next_slot = 0
 ensemble_count = 0
+current_tonality = None # Memory: 'major' or 'minor'
 
 def ableton_handler(address, *args):
     global query_result, last_error
@@ -278,13 +279,183 @@ def process_file_handler(address, *args):
             print("[CONTROLLER] Error: " + str(e))
             traceback.print_exc()
 
+import ctypes
+from ctypes import wintypes
+
+# Load DLL once
+winmm = ctypes.WinDLL('winmm')
+
+# WinMM MIDI Structures for direct Windows MIDI access (Bypasses broken rtmidi)
+class MIDIOUTCAPS(ctypes.Structure):
+    _fields_ = [
+        ("wMid", wintypes.WORD),
+        ("wPid", wintypes.WORD),
+        ("vDriverVersion", wintypes.UINT),
+        ("szPname", ctypes.c_char * 32),
+        ("dwSupport", wintypes.DWORD),
+    ]
+
+# State Management for MIDI Toggles
+current_effects = {
+    "piano": "none", "guitar": "none", "bass": "none", "strings": "none", "winds": "none"
+}
+
+EFFECT_NOTES = {
+    "piano": {"dist": 43, "echo": 48},
+    "guitar": {"dist": 44, "airy": 49},
+    "bass": {"dist": 45, "reverb": 50},
+    "strings": {"dist": 46, "chorus": 51},
+    "winds": {"dist": 47, "phaser": 52}
+}
+
+def pulse_note(h_midi, n):
+    """Sends a deterministic MIDI Note On/Off pulse to toggle Ableton parameters."""
+    # 0x90 = Note On, 127 = Velocity
+    winmm.midiOutShortMsg(h_midi, (127 << 16) | (n << 8) | 0x90)
+    time.sleep(0.15) 
+    # 0x80 = Note Off, 0 = Velocity
+    winmm.midiOutShortMsg(h_midi, (0 << 16) | (n << 8) | 0x80)
+
+def performance_setup_handler(address, *args):
+    """Sets up Ableton based on final aggregated results from the web."""
+    # Handle both individual args and a single list/tuple arg
+    if len(args) == 1 and isinstance(args[0], (list, tuple)):
+        args = args[0]
+
+    if len(args) < 10: 
+        print(f"[PERFORMANCE] Error: Expected 10 args, got {len(args)}")
+        return
+    
+    genre = args[0]
+    tempo = args[1]
+    mode = args[2]
+    tone = args[3]
+    # args[4] is reserved for guitar_fx placeholder
+    p_fx, g_fx, b_fx, s_fx, w_fx = args[5:10]
+    
+    print(f"\n[PERFORMANCE] Initiating: {genre.upper()} | {tempo} BPM | {mode.upper()} | Human Tone: {tone}")
+    
+    # 1. Set Global Tempo
+    client_sender.send_message("/live/song/set/tempo", [float(tempo)])
+    
+    # 2. MIDI Toggles (Tonality & Effects)
+    try:
+        num_devs = winmm.midiOutGetNumDevs()
+        target_id = -1
+        for i in range(num_devs):
+            caps = MIDIOUTCAPS()
+            if winmm.midiOutGetDevCapsA(i, ctypes.pointer(caps), ctypes.sizeof(caps)) == 0:
+                if b"loopmidi" in caps.szPname.lower():
+                    target_id = i
+                    break
+        
+        if target_id != -1:
+            h_midi = wintypes.HANDLE()
+            if winmm.midiOutOpen(ctypes.pointer(h_midi), target_id, 0, 0, 0) == 0:
+                try:
+                    # Initial delay to let global Tempo settle
+                    time.sleep(0.5)
+
+                    # A. Tonality
+                    NOTE_MAJOR = 41
+                    NOTE_MINOR = 42
+                    global current_tonality
+                    target_mode = str(mode).lower()
+                    if current_tonality != target_mode:
+                        # If we have a known previous state, toggle it off
+                        if current_tonality == "major": pulse_note(h_midi, NOTE_MAJOR)
+                        elif current_tonality == "minor": pulse_note(h_midi, NOTE_MINOR)
+                        time.sleep(0.2)
+                        # Toggle the new state on
+                        if target_mode == "major": pulse_note(h_midi, NOTE_MAJOR)
+                        elif target_mode == "minor": pulse_note(h_midi, NOTE_MINOR)
+                        current_tonality = target_mode
+                        print(f"[TONALITY] Toggled to {target_mode}")
+
+                    # B. Effects (Smart Toggle Sync)
+                    inst_map = ["piano", "guitar", "bass", "strings", "winds"]
+                    new_vals = [p_fx, g_fx, b_fx, s_fx, w_fx]
+
+                    for inst, target in zip(inst_map, new_vals):
+                        if current_effects[inst] == target:
+                            continue # Already in the desired state
+                        
+                        # 1. If an effect is currently on and needs to change/stop, turn it off
+                        if current_effects[inst] != "none":
+                            print(f"[EFFECTS] Resetting {inst.upper()}: {current_effects[inst]} -> none")
+                            pulse_note(h_midi, EFFECT_NOTES[inst][current_effects[inst]])
+                            time.sleep(0.2)
+                        
+                        # 2. If the new target is an effect, turn it on
+                        if target != "none":
+                            print(f"[EFFECTS] {inst.upper()} -> {target}")
+                            pulse_note(h_midi, EFFECT_NOTES[inst][target])
+                            time.sleep(0.2)
+                        
+                        current_effects[inst] = target
+
+                finally:
+                    winmm.midiOutClose(h_midi)
+    except Exception as e:
+        print(f"[MIDI] Performance Setup Error: {e}")
+
+    # 3. Human Guitar Tone Arming (Tracks 31, 32, 33)
+    tone_map = {"1": 31, "2": 32, "3": 33}
+    target_track = tone_map.get(str(tone))
+    if target_track is not None:
+        print(f"[GUITAR] Arming track {target_track} for Human Tone {tone}")
+        for t in [31, 32, 33]:
+            client_sender.send_message("/live/track/set/arm", [t, 1 if t == target_track else 0])
+
+def reset_all_handler(address, *args):
+    """Surgically turns off all active effects and resets state based on memory."""
+    print("[SYSTEM] Resetting active effects...")
+    try:
+        num_devs = winmm.midiOutGetNumDevs()
+        target_id = -1
+        for i in range(num_devs):
+            caps = MIDIOUTCAPS()
+            if winmm.midiOutGetDevCapsA(i, ctypes.pointer(caps), ctypes.sizeof(caps)) == 0:
+                if b"loopmidi" in caps.szPname.lower():
+                    target_id = i; break
+        
+        if target_id != -1:
+            h_midi = wintypes.HANDLE()
+            if winmm.midiOutOpen(ctypes.pointer(h_midi), target_id, 0, 0, 0) == 0:
+                try:
+                    # 1. Reset Effects
+                    for inst, current in current_effects.items():
+                        if current != "none":
+                            print(f"[RESET] Toggling OFF {inst.upper()} {current}")
+                            note = EFFECT_NOTES[inst][current]
+                            pulse_note(h_midi, note)
+                            time.sleep(0.1)
+                        current_effects[inst] = "none"
+                    
+                    # 2. Reset Tonality
+                    global current_tonality
+                    if current_tonality is not None:
+                        print(f"[RESET] Toggling OFF tonality: {current_tonality}")
+                        pulse_note(h_midi, 41 if current_tonality == "major" else 42)
+                        current_tonality = None
+
+                finally:
+                    winmm.midiOutClose(h_midi)
+        print("[SYSTEM] Reset Complete.")
+    except Exception as e:
+        print(f"[SYSTEM] Reset Error: {e}")
+
 def main():
     ableton_dispatcher = dispatcher.Dispatcher()
     ableton_dispatcher.set_default_handler(ableton_handler)
     ableton_dispatcher.map("/live/clip_slot/get/has_clip", ableton_handler)
     ableton_dispatcher.map("/live/error", ableton_handler)
+    
     web_dispatcher = dispatcher.Dispatcher()
     web_dispatcher.map("/web/midi/process_file", process_file_handler)
+    web_dispatcher.map("/performance/setup", performance_setup_handler)
+    web_dispatcher.map("/system/resetall", reset_all_handler)
+    
     start_server = lambda ip, port, disp: threading.Thread(
         target=osc_server.ThreadingOSCUDPServer((ip, port), disp).serve_forever, daemon=True
     ).start()
