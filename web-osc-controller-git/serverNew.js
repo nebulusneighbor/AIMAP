@@ -489,9 +489,9 @@ io.on("connection", (socket) => {
                         { address: '/avatar/drum2/skin', args: [getSkinIdx(m.drum2)] },
                         { address: '/avatar/guitar/skin', args: [getSkinIdx(m.guitar)] },
                         { address: '/avatar/bass/skin', args: [getSkinIdx(m.bass)] },
-                        { address: '/avatar/violin/skin', args: [getSkinIdx(m.strings)] },
+                        { address: '/avatar/strings/skin', args: [getSkinIdx(m.strings)] },
                         { address: '/avatar/piano/skin', args: [getSkinIdx(m.piano)] },
-                        { address: '/avatar/flute/skin', args: [getSkinIdx(m.winds)] }
+                        { address: '/avatar/winds/skin', args: [getSkinIdx(m.winds)] }
                     ];
 
                     for (const msg of unityMessages) {
@@ -518,9 +518,25 @@ io.on("connection", (socket) => {
             globalClickCount = 0;
             lastCalculatedResults = null;
 
-            // Reset Ableton Effects State
+            // // Reset Ableton Effects State
+            // const abletonClient = new Client(oscTargets.ableton.ip, oscTargets.ableton.port);
+            // abletonClient.send('/system/resetall', 1, () => abletonClient.close());
+            // Reset OSC state on both audio and visuals pipelines.
             const abletonClient = new Client(oscTargets.ableton.ip, oscTargets.ableton.port);
-            abletonClient.send('/system/resetall', 1, () => abletonClient.close());
+            const unityClient = new Client(oscTargets.unity.ip, oscTargets.unity.port);
+            (async () => {
+                try {
+                    await sendOscAsync(abletonClient, '/system/resetall', [1]);
+                    await sendOscAsync(unityClient, '/system/resetall', []);
+                    console.log(`Reset sent to Ableton ${oscTargets.ableton.ip}:${oscTargets.ableton.port} and Unity ${oscTargets.unity.ip}:${oscTargets.unity.port}`);
+                } catch (error) {
+                    console.error("Failed to send OSC resetall:", error);
+                } finally {
+                    abletonClient.close();
+                    unityClient.close();
+                }
+            })();
+            
 
             io.emit("phase_change", appState);
             io.emit("aggregator_reset");
