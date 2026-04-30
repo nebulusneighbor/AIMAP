@@ -12,27 +12,28 @@
         <form method="POST" action="/submit">
             <div class="input-group">
                 <h3>Musical Feel</h3>
-                <select name="genre" required>
-                    <option value="">Select Feel</option>
+                <select name="genre">
+                    <option value="" selected>Select Feel</option>
                     <option value="drive/rock">Drive / Rock</option>
                     <option value="pulse/hiphop">Pulse / Electronic / HipHop</option>
                     <option value="groove/funky">Groove / Funky</option>
-                    <option value="elegant/atmospheric">Elegant / Atmospheric</option>
+                    <option value="elegant/atmospheric">Elegant / Atmos</option>
                 </select>
             </div>
 
             <div class="grid-2">
                 <div class="input-group">
-                    <h3>Tempo</h3>
-                    <label>Current: <span id="tempoValue" style="color: var(--primary-color); font-weight: 800;">115</span> BPM</label>
-                    <input type="range" id="tempo" name="tempo" min="90" max="140" value="115">
-                </div>
-                <div class="input-group">
                     <h3>Musical Mode</h3>
-                    <select name="mode" required>
+                    <select name="mode">
+                        <option value="" disabled selected>Select Mode</option>
                         <option value="major">Major</option>
                         <option value="minor">Minor</option>
                     </select>
+                </div>
+                <div class="input-group">
+                    <h3>Tempo</h3>
+                    <label>Current: <span id="tempoValue" style="color: var(--primary-color); font-weight: 800;">115</span> BPM</label>
+                    <input type="range" id="tempo" name="tempo" min="90" max="140" value="115">
                 </div>
             </div>
 
@@ -41,7 +42,12 @@
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <span class="option-tag" style="margin: 0;">Set Human Guitar Tone</span>
                     <div class="param-bubble">
-                        Tone <select name="human_guitar_tone"><option>1</option><option>2</option><option>3</option></select>
+                        <select name="human_guitar_tone">
+                            <option value="" selected>Select Tone</option>
+                            <option value="1">Clean as a whistle</option>
+                            <option value="2">Raging solo lead</option>
+                            <option value="3">Ethereal fuzz</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -49,24 +55,89 @@
             <h3>Which avatar instruments?</h3>
 
             <div class="instrument-row">
-                <div class="instrument-main"><label class="effect-label"><input type="checkbox" value="guitar"> Avatar Guitar</label></div>
-                <div class="param-bubble">FX <select name="guitar_fx"><option>1</option><option>2</option><option>3</option></select></div>
+                <div class="instrument-main"><span class="option-tag">Avatar Guitar</span>
+                    <select name="guitar_include" class="inst-include-sel">
+                        <option value="" selected>Select Inclusion</option>
+                        <option value="yes">Include Guitar</option>
+                        <option value="no">Exclude</option>
+                    </select>
+                </div>
+                <div class="param-bubble">
+                    <select name="guitar_fx_choice">
+                        <option value="" selected>Select FX</option>
+                        <option value="default">Default</option>
+                        <option value="dist">Distortion</option>
+                        <option value="airy">Airy Chorus</option>
+                    </select>
+                </div>
             </div>
             <div class="instrument-row">
-                <div class="instrument-main"><label class="effect-label"><input type="checkbox" value="bass"> Bass</label></div>
-                <div class="param-bubble">FX <select name="bass_fx"><option>1</option><option>2</option><option>3</option></select></div>
+                <div class="instrument-main"><span class="option-tag">Bass</span>
+                    <select name="bass_include" class="inst-include-sel">
+                        <option value="" selected>Select Inclusion</option>
+                        <option value="yes">Include Bass</option>
+                        <option value="no">Exclude</option>
+                    </select>
+                </div>
+                <div class="param-bubble">
+                    <select name="bass_fx_choice">
+                        <option value="" selected>Select FX</option>
+                        <option value="default">Default</option>
+                        <option value="dist">Distortion</option>
+                        <option value="reverb">Reverb</option>
+                    </select>
+                </div>
             </div>
             <div class="instrument-row">
-                <div class="instrument-main"><label class="effect-label"><input type="checkbox" value="piano"> Piano</label></div>
-                <div class="param-bubble">FX <select name="piano_fx"><option>1</option><option>2</option><option>3</option></select></div>
+                <div class="instrument-main"><span class="option-tag">Piano</span>
+                    <select name="piano_include" class="inst-include-sel">
+                        <option value="" selected>Select Inclusion</option>
+                        <option value="yes">Include Piano</option>
+                        <option value="no">Exclude</option>
+                    </select>
+                </div>
+                <div class="param-bubble">
+                    <select name="piano_fx_choice">
+                        <option value="" selected>Select FX</option>
+                        <option value="default">Default</option>
+                        <option value="dist">Distortion</option>
+                        <option value="echo">Echo</option>
+                    </select>
+                </div>
             </div>
             <div class="instrument-row">
-                <div class="instrument-main"><label class="effect-label"><input type="checkbox" value="strings"> Strings</label></div>
-                <div class="param-bubble">FX <select name="strings_fx"><option>1</option><option>2</option><option>3</option></select></div>
+                <div class="instrument-main"><span class="option-tag">Strings</span>
+                    <select name="strings_include" class="inst-include-sel">
+                        <option value="" selected>Select Inclusion</option>
+                        <option value="yes">Include Strings</option>
+                        <option value="no">Exclude</option>
+                    </select>
+                </div>
+                <div class="param-bubble">
+                    <select name="strings_fx_choice">
+                        <option value="" selected>Select FX</option>
+                        <option value="default">Default</option>
+                        <option value="dist">Distortion</option>
+                        <option value="chorus">Chorus</option>
+                    </select>
+                </div>
             </div>
             <div class="instrument-row" style="margin-bottom: 2rem;">
-                <div class="instrument-main"><label class="effect-label"><input type="checkbox" value="winds"> Winds / Flute</label></div>
-                <div class="param-bubble">FX <select name="winds_fx"><option>1</option><option>2</option><option>3</option></select></div>
+                <div class="instrument-main"><span class="option-tag">Winds / Flute</span>
+                    <select name="winds_include" class="inst-include-sel">
+                        <option value="" selected>Select Inclusion</option>
+                        <option value="yes">Include Winds</option>
+                        <option value="no">Exclude</option>
+                    </select>
+                </div>
+                <div class="param-bubble">
+                    <select name="winds_fx_choice">
+                        <option value="" selected>Select FX</option>
+                        <option value="default">Default</option>
+                        <option value="dist">Distortion</option>
+                        <option value="phaser">Phaser</option>
+                    </select>
+                </div>
             </div>
 
             <input type="hidden" name="instruments" id="instrumentHidden">
@@ -86,11 +157,14 @@
         function updateInstruments() {
             const data = {};
             ['guitar', 'bass', 'piano', 'strings', 'winds'].forEach(inst => {
-                if (document.querySelector(`input[value="${inst}"]`).checked) data[inst] = true;
+                const val = document.querySelector(`select[name="${inst}_include"]`).value;
+                if (val === "yes") data[inst] = true;
+                else if (val === "no") data[inst] = false;
+                // "" remains unmapped/undefined for AI fallback
             });
             hidden.value = JSON.stringify(data);
         }
-        document.querySelectorAll("input[type=checkbox]").forEach(cb => cb.onchange = updateInstruments);
+        document.querySelectorAll(".inst-include-sel").forEach(s => s.onchange = updateInstruments);
     </script>
 </body>
 </html>

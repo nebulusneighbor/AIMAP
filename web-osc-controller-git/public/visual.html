@@ -17,7 +17,8 @@
             
             <div class="input-group">
                 <h3>Environment</h3>
-                <select name="environment" required>
+                <select name="environment">
+                    <option value="" selected>Select Environment</option>
                     <option value="haunted forest">Haunted Forest</option>
                     <option value="mars scape">Mars Scape</option>
                     <option value="laser grid">Laser Grid</option>
@@ -37,6 +38,7 @@
                             <div>
                                 <span class="option-tag">Choose Dance Move</span>
                                 <select name="d1_move">
+                                    <option value="" selected>Select Move</option>
                                     <option value="hiphop">Hip Hop</option>
                                     <option value="breakdance">Breakdance</option>
                                     <option value="latin">Latin</option>
@@ -56,6 +58,7 @@
                             <div>
                                 <span class="option-tag">Choose Dance Move</span>
                                 <select name="d2_move">
+                                    <option value="" selected>Select Move</option>
                                     <option value="hiphop">Hip Hop</option>
                                     <option value="breakdance">Breakdance</option>
                                     <option value="latin">Latin</option>
@@ -83,8 +86,6 @@
                 </div>
             </div>
 
-            <input type="hidden" name="genre" value="visual">
-            <input type="hidden" name="instruments" value="visual">
             <button type="submit" style="margin-top: 2rem;">Lock In Visuals</button>
         </form>
     </div>
@@ -102,7 +103,7 @@
 
         function populateSelects() {
             const selects = document.querySelectorAll(".all-chars-sel");
-            let html = "";
+            let html = '<option value="" selected>Select Character</option>';
             allCharacters.forEach(g => {
                 html += `<optgroup label="${g.group}">`;
                 g.members.forEach(m => {

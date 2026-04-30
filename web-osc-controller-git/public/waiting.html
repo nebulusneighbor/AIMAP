@@ -8,20 +8,38 @@
 <body>
     <div class="dots"></div>
     <div class="login-container">
-        <h1>Submission Received</h1>
-        <p style="color: rgba(255,255,255,0.6); margin-bottom: 2rem;">
+        <h1 id="statusHeader">Submission Received</h1>
+        <p id="statusText" style="color: rgba(255,255,255,0.6); margin-bottom: 2rem;">
             Your choices have been locked in. Waiting for the final aggregation...
         </p>
-        <div class="loader" style="border: 4px solid var(--primary-color); border-top: 4px solid transparent; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: auto;"></div>
+        <div class="loader" id="statusLoader" style="border: 4px solid var(--primary-color); border-top: 4px solid transparent; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: auto;"></div>
     </div>
     <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        socket.on("results_ready", () => window.location.href = "/");
+        const header = document.getElementById('statusHeader');
+        const text = document.getElementById('statusText');
+
+        socket.on("results_ready", () => {
+            header.textContent = "Aggregation Complete";
+            text.textContent = "The results are in! Performance starting soon...";
+        });
+
+        socket.on("performance_started", () => {
+            header.textContent = "Live Performance";
+            text.textContent = "The performance is now in progress! Enjoy the show.";
+            document.getElementById('statusLoader').style.display = 'none';
+        });
+
         socket.on("force_reset_session", () => {
-            // Logic to clear submission flag on client-side if needed, but the server handles it via appState reset
             window.location.href = "/";
+        });
+
+        socket.on("phase_change", (state) => {
+            if (state.phase === 'lobby') {
+                window.location.href = "/";
+            }
         });
     </script>
 </body>
