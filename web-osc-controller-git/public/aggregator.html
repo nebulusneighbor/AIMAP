@@ -5,72 +5,153 @@
     <title>AIMAP - Aggregator View</title>
     <link rel="stylesheet" href="/style.css">
     <style>
-        .result-box { display: none; animation: fadeIn 1s ease; }
-        .big-number { font-size: 3.5rem; font-weight: 900; color: var(--primary-color); text-shadow: var(--accent-glow); }
-        .live-user-feed { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; max-height: 200px; overflow-y: hidden; }
-        .user-tag { background: rgba(0, 242, 254, 0.15); border: 1px solid var(--primary-color); padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .results-grid-detailed { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.2rem; text-align: left; }
-        .detail-card { background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .detail-card h4 { color: var(--secondary-color); font-size: 0.7rem; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .detail-val { font-size: 1.2rem; font-weight: 800; color: white; }
-        .chart-container { position: relative; background: rgba(255,255,255,0.02); padding: 2rem 1rem; border-radius: 16px; margin: 1.5rem 0; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
-        .threshold-line { position: absolute; top: 20px; left: 0; width: 100%; height: 60px; border-bottom: 2px dashed rgba(244, 63, 94, 0.5); pointer-events: none; z-index: 1; }
-        .threshold-label { position: absolute; right: 10px; top: 65px; color: #f43f5e; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; }
-        .bar-wrap { text-align: center; min-width: 90px; position: relative; z-index: 2; }
-        .bar-bg { height: 100px; width: 35px; background: rgba(255,255,255,0.05); border-radius: 6px; position: relative; margin: auto; overflow: hidden; }
+        /* ============================================================
+           AUDIENCE UI - UNIFIED VOTING DISPLAY
+           ============================================================ */
+        
+        .login-container { 
+            max-width: 1800px !important; 
+            width: 98%; 
+            max-height: none !important; 
+            padding: 2rem !important;
+            margin: 1rem auto;
+        }
+
+        /* WINNER HIGHLIGHT: Variables being sent to Unity/Ableton */
+        .winner-text { color: #10b981 !important; font-weight: 900 !important; }
+        .winner-bar { background: #10b981 !important; }
+
+        .results-grid-detailed { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 1.2rem; 
+            text-align: left; 
+            margin-bottom: 2rem;
+        }
+
+        body { font-size: 1.4rem; } 
+        h3 { font-size: 2.4rem !important; margin-bottom: 1.5rem !important; border-bottom: 4px solid var(--primary-color) !important; display: inline-block; text-transform: uppercase; } 
+        
+        .detail-card { 
+            background: rgba(255,255,255,0.05); 
+            padding: 1.8rem; 
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .detail-card h4 { 
+            font-size: 1.8rem !important; 
+            color: var(--primary-color); 
+            font-weight: 900;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        /* Horizontal Vote Bars */
+        .chart-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .chart-label { width: 140px; font-size: 1.1rem; font-weight: 800; text-align: right; color: rgba(255,255,255,0.8); }
+        .chart-percent { width: 55px; font-size: 1.2rem; font-weight: 900; color: var(--secondary-color); text-align: left; }
+        .chart-bar-bg { flex-grow: 1; height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; }
+        .chart-bar-fill { height: 100%; background: var(--secondary-color); border-radius: 5px; transition: width 1s ease; }
+        
+        /* Vertical Instrument Bars */
+        .bar-wrap { text-align: center; min-width: 90px; }
+        .bar-bg { height: 110px; width: 40px; background: rgba(255,255,255,0.05); border-radius: 8px; position: relative; margin: auto; overflow: hidden; }
         .bar-fill { position: absolute; bottom: 0; width: 100%; background: var(--primary-color); transition: height 1.5s ease; }
-        .included-tag { font-size: 0.55rem; color: #10b981; font-weight: 900; margin-top: 5px; opacity: 0; transition: opacity 1s 1.5s; }
-        .mode-section { display: none; margin-top: 2rem; }
+        .bar-wrap p { font-size: 1.1rem !important; font-weight: 900 !important; margin-top: 10px; text-transform: uppercase; }
+        .fx-label { font-size: 1.2rem !important; color: var(--secondary-color); font-weight: 900; margin-bottom: 10px; text-transform: uppercase; height: 1.8rem; display: flex; align-items: center; justify-content: center; }
+        .included-tag { font-size: 1.4rem !important; font-weight: 900; color: #10b981; margin-top: 8px; }
+
+        /* Stage Setup Cards */
+        .directed-section { margin-top: 2rem; text-align: left; background: rgba(255,255,255,0.02); padding: 2rem; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); }
+        .param-card { 
+            background: rgba(255,255,255,0.03); 
+            padding: 1.2rem; 
+            border-radius: 12px; 
+            border-left: 6px solid var(--secondary-color); 
+        }
+        .param-card h5 { font-size: 0.9rem; color: var(--secondary-color); opacity: 0.9; margin-bottom: 6px; text-transform: uppercase; font-weight: 900; }
+        .param-card div { font-size: 1.6rem; font-weight: 900; color: white; }
+
+        .results-container-flex { display: flex; flex-wrap: wrap; gap: 2.5rem; }
+        .results-container-flex > div { flex: 1; min-width: 600px; }
+
+        .result-box { display: none; animation: fadeIn 1s ease; }
+        .big-number { font-size: 8rem; font-weight: 900; color: var(--primary-color); text-shadow: var(--accent-glow); }
+        .live-user-feed { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .user-tag { background: rgba(0, 242, 254, 0.15); border: 1px solid var(--primary-color); padding: 0.8rem 1.5rem; border-radius: 30px; font-size: 1.4rem; animation: popIn 0.5s ease; }
+        
+        .threshold-line { position: absolute; top: 40px; left: 0; width: 100%; height: 60px; border-bottom: 2px dashed rgba(244, 63, 94, 0.5); z-index: 1; }
+        .threshold-label { position: absolute; right: 10px; top: 105px; color: #f43f5e; font-size: 1rem; font-weight: 900; text-transform: uppercase; }
+        .chart-container { position: relative; background: rgba(255,255,255,0.02); border-radius: 16px; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
     </style>
 </head>
 <body>
     <div class="dots"></div>
-    <div class="login-container" style="max-width: 1100px; padding: 3rem;">
+    <div class="login-container">
         
         <div id="waitingState">
-            <h1 id="headerText">WAITING FOR AUDIENCE</h1>
-            <div id="counter" class="big-number" style="font-size: 8rem;">0</div>
-            <p style="letter-spacing: 0.3em; opacity: 0.6; margin-bottom: 2rem;">SUBMISSIONS RECEIVED</p>
+            <h1 id="headerText" style="font-size: 3.5rem;">WAITING FOR AUDIENCE</h1>
+            <div id="counter" class="big-number">0</div>
+            <p style="letter-spacing: 0.4em; opacity: 0.6; font-size: 1.5rem; margin-bottom: 3rem;">SUBMISSIONS RECEIVED</p>
             <div id="userFeed" class="live-user-feed"></div>
         </div>
 
         <div id="resultsView" class="result-box">
-            <h1 style="font-size: 4rem; margin-bottom: 2rem; color: var(--primary-color);">FINAL RESULTS</h1>
+            <h1 style="font-size: 4rem; margin-bottom: 3rem; color: var(--primary-color);">FINAL RESULTS</h1>
             
-            <!-- SHARED AUDIO RESULTS (Used in 'audio' and 'both') -->
-            <div id="audioResults" class="mode-section">
-                <div class="results-grid-detailed">
-                    <div class="detail-card"><h4>Top Feel</h4><div id="resGenre" class="detail-val">--</div></div>
-                    <div class="detail-card"><h4>Musical Mode</h4><div id="resMode" class="detail-val">--</div></div>
-                    <div class="detail-card"><h4>Avg Tempo</h4><div id="resTempo" class="detail-val">--</div></div>
-                    <div class="detail-card"><h4>Human Guitar</h4><div id="resHumanTone" class="detail-val">--</div></div>
+            <!-- TOP ROW: Feel, Mode, Tone, Tempo, Env -->
+            <div class="results-grid-detailed" style="margin-bottom: 3rem;">
+                <div class="detail-card">
+                    <h4>Musical Feel</h4>
+                    <div id="resGenreChart"></div>
                 </div>
-                <h3 style="margin-top: 2.5rem; text-align: left;">Avatar Instrument Mix (50% Threshold)</h3>
-                <div class="chart-container">
-                    <div class="threshold-line"></div><div class="threshold-label">Included &uarr;</div>
-                    <div id="resInstruments" style="display: contents;"></div>
+                <div class="detail-card">
+                    <h4>Musical Mode</h4>
+                    <div id="resModeChart"></div>
+                </div>
+                <div class="detail-card">
+                    <h4>Human Guitar Tone</h4>
+                    <div id="resToneChart"></div>
+                </div>
+                <div class="detail-card" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <h4>Tempo</h4>
+                    <div id="resTempoVal" class="winner-text" style="font-size: 4rem; line-height: 1;">115</div>
+                    <div style="font-size: 1.5rem; color: var(--secondary-color); font-weight: 900; margin-top: 10px;">BPM</div>
+                </div>
+                <div class="detail-card">
+                    <h4>Environment</h4>
+                    <div id="resEnvChart"></div>
                 </div>
             </div>
 
-            <!-- SHARED VISUAL RESULTS (Used in 'visual' and 'both') -->
-            <div id="visualResults" class="mode-section">
-                <div class="results-grid-detailed" style="margin-bottom: 1.5rem;">
-                    <div class="detail-card"><h4>Environment</h4><div id="resEnv" class="detail-val">--</div></div>
+            <div class="results-container-flex">
+                <div id="audioResults" class="unified-section" style="flex: 1.2;">
+                    <h3 style="text-align: left;">Instrument Mix</h3>
+                    <div class="chart-container" style="padding: 40px 20px; margin-top: 1rem;">
+                        <div id="resInstruments" style="display: contents;"></div>
+                    </div>
                 </div>
-                <div class="grid-2" style="gap: 2rem;">
-                    <div class="detail-card">
-                        <h4>Dancer Configurations</h4>
-                        <div style="font-size: 0.9rem; line-height: 1.6;">
-                            <div style="margin-bottom: 1rem;"><b style="color: var(--primary-color);">Dancer 1:</b><br><span id="resD1"></span></div>
-                            <div><b style="color: var(--primary-color);">Dancer 2:</b><br><span id="resD2"></span></div>
+
+                <div id="visualResults" class="unified-section">
+                    <h3 style="text-align: left;">Dancer Moves</h3>
+                    <div class="results-grid-detailed" style="grid-template-columns: 1fr 1fr; margin-top: 1rem;">
+                        <div class="detail-card">
+                            <h4>Dancer 1</h4>
+                            <div id="resD1Chart"></div>
+                        </div>
+                        <div class="detail-card">
+                            <h4>Dancer 2</h4>
+                            <div id="resD2Chart"></div>
                         </div>
                     </div>
-                    <div class="detail-card">
-                        <h4>Band Avatar Species</h4>
-                        <div id="resBandSpecies" class="detail-val" style="margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">--</div>
-                        <div id="resBandMembers" style="font-size: 0.75rem; line-height: 1.5; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;"></div>
-                    </div>
+                </div>
+            </div>
+
+            <div id="stageSetupSection" class="directed-section">
+                <h3>Virtual Stage & Band Crew</h3>
+                <div id="stageSetupList" class="results-grid-detailed" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 1.5rem;">
+                    <!-- Populated by JS -->
                 </div>
             </div>
         </div>
@@ -99,50 +180,137 @@
             document.getElementById('userFeed').innerHTML = '';
         });
 
+        const isAudioCategory = (cat) => ['genre', 'mode', 'tone', 'instruments'].includes(cat);
+        const isVisualCategory = (cat) => ['environment', 'd1_move', 'd2_move', 'd1_char', 'd2_char', 'band'].includes(cat);
+
+        function shouldShowDist(cat, mode) {
+            if (mode === 'both') return true;
+            if (mode === 'audio') return isAudioCategory(cat);
+            if (mode === 'visual') return isVisualCategory(cat);
+            return false;
+        }
+
+        function formatLabel(label) {
+            let displayLabel = label.toUpperCase().replace(/\//g, ' / ').replace(/_/g, ' ');
+            if (displayLabel === "1") return "CLEAN";
+            if (displayLabel === "2") return "RAGING";
+            if (displayLabel === "3") return "ETHEREAL";
+            return displayLabel;
+        }
+
+        function renderVoteChart(containerId, category, data, total, winnerValue, currentMode) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+
+            const showDist = shouldShowDist(category, currentMode);
+
+            if (!showDist || !data || Object.keys(data).length === 0) {
+                // LIST MODE: Just show the final choice in green
+                const winnerDisplay = formatLabel(String(winnerValue || "Randomized"));
+                container.innerHTML = `<div class="winner-text" style="font-size: 2.2rem; padding: 10px; border-left: 4px solid #10b981; padding-left: 15px;">${winnerDisplay}</div>`;
+                return;
+            }
+
+            // VOTE MODE: Show full distribution
+            const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+            sorted.forEach(([label, count]) => {
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                const displayLabel = formatLabel(label);
+                const isWinner = (String(label) === String(winnerValue));
+
+                container.innerHTML += `
+                    <div class="chart-row ${isWinner ? 'winner-text' : ''}">
+                        <div class="chart-label">${displayLabel}</div>
+                        <div class="chart-bar-bg"><div class="chart-bar-fill ${isWinner ? 'winner-bar' : ''}" style="width: ${pct}%"></div></div>
+                        <div class="chart-percent">${pct}%</div>
+                    </div>`;
+            });
+        }
+
         socket.on("results_ready", r => {
             if (!r) return;
             document.getElementById('waitingState').style.display = 'none';
             document.getElementById('resultsView').style.display = 'block';
 
-            // Show relevant sections
-            if (r.mode === 'audio' || r.mode === 'both') document.getElementById('audioResults').style.display = 'block';
-            if (r.mode === 'visual' || r.mode === 'both') document.getElementById('visualResults').style.display = 'block';
+            const mode = r.mode;
+            const dist = r.distributions || {};
+            const total = r.count;
 
-            // Audio Map
-            if (r.genre) {
-                document.getElementById('resGenre').textContent = r.genre;
-                document.getElementById('resMode').textContent = r.mode_val || r.mode; // Adjusted key to avoid conflict
-                document.getElementById('resTempo').textContent = r.tempo + " BPM";
-                document.getElementById('resHumanTone').textContent = "Tone " + r.humanGuitarTone;
+            // Global Metrics
+            document.getElementById('resTempoVal').textContent = r.tempo || 115;
 
-                const instDiv = document.getElementById('resInstruments');
-                instDiv.innerHTML = '';
-                for (let [name, count] of Object.entries(r.instruments)) {
-                    const pct = Math.round((count / r.count) * 100) || 0;
-                    const included = pct >= 50;
-                    const fx = r.topFX[name] || "1";
+            // Overview Population
+            renderVoteChart('resGenreChart', 'genre', dist.genre, total, r.genre, mode);
+            renderVoteChart('resModeChart', 'mode', dist.mode, total, r.mode_val, mode);
+            renderVoteChart('resToneChart', 'tone', dist.tone, total, r.humanGuitarTone, mode);
+            renderVoteChart('resEnvChart', 'environment', dist.environment, total, r.environment, mode);
+
+            // 1. Instrument Mix
+            const showInstDist = shouldShowDist('instruments', mode);
+            const fxLabels = { "dist": "Distortion", "echo": "Echo", "airy": "Airy Chorus", "reverb": "Reverb", "chorus": "Chorus", "phaser": "Phaser", "none": "None", "default": "Default" };
+            const instDiv = document.getElementById('resInstruments');
+            instDiv.innerHTML = '';
+            
+            for (let [name, count] of Object.entries(r.instruments)) {
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                const included = pct >= 50;
+                const fxVal = r.fx_choices ? r.fx_choices[name] : "none";
+                const fxLabel = fxLabels[fxVal] || fxVal;
+
+                if (showInstDist) {
                     instDiv.innerHTML += `
-                        <div class="bar-wrap">
-                            <div style="font-size: 0.6rem; color: var(--secondary-color); font-weight: 800; margin-bottom: 5px;">FX ${fx}</div>
-                            <div class="bar-bg"><div class="bar-fill" style="height: ${pct}%; background: ${included ? 'var(--primary-color)' : 'rgba(255,255,255,0.2)'}"></div></div>
-                            <p style="font-size: 0.65rem; text-transform: uppercase; margin-top: 8px; font-weight: 700;">${name}</p>
+                        <div class="bar-wrap ${included ? 'winner-text' : ''}">
+                            <div class="fx-label ${included ? 'winner-text' : ''}">${fxLabel}</div>
+                            <div class="bar-bg"><div class="bar-fill ${included ? 'winner-bar' : ''}" style="height: ${pct}%;"></div></div>
+                            <p>${name}</p>
                             <div class="included-tag" style="opacity: ${included ? 1 : 0}">INCLUDED</div>
+                        </div>`;
+                } else if (included) {
+                    // Just list included instruments if not in audio vote mode
+                    instDiv.innerHTML += `
+                        <div class="param-card" style="margin-bottom: 0; min-width: 150px;">
+                            <div class="fx-label winner-text" style="justify-content: flex-start;">${fxLabel}</div>
+                            <div class="winner-text" style="font-size: 1.8rem;">${name.toUpperCase()}</div>
                         </div>`;
                 }
             }
 
-            // Visual Map
-            if (r.environment) {
-                document.getElementById('resEnv').textContent = r.environment;
-                document.getElementById('resD1').textContent = `${r.dancers.d1.char.replace(/_/g, ' ')} performing ${r.dancers.d1.move}`;
-                document.getElementById('resD2').textContent = `${r.dancers.d2.char.replace(/_/g, ' ')} performing ${r.dancers.d2.move}`;
+            // 2. Choreography
+            renderVoteChart('resD1Chart', 'd1_move', dist.d1_move, total, r.dancers.d1.move, mode);
+            renderVoteChart('resD2Chart', 'd2_move', dist.d2_move, total, r.dancers.d2.move, mode);
+
+            // 3. Crew Grid
+            const stageList = document.getElementById('stageSetupList');
+            let stageHtml = '';
+
+            const renderCrewCard = (role, category, winner, categoryDist) => {
+                let html = `<div class="param-card"><h5>${role} Avatar</h5>`;
+                const showDist = shouldShowDist(category, mode);
                 
-                const bMem = document.getElementById('resBandMembers');
-                bMem.innerHTML = '';
-                for (let [m, char] of Object.entries(r.band.members)) {
-                    bMem.innerHTML += `<div><b style="color: var(--secondary-color)">${m}:</b> ${char.replace(/_/g, ' ')}</div>`;
+                if (showDist && categoryDist && Object.keys(categoryDist).length > 0) {
+                    const winnerCount = categoryDist[winner] || 0;
+                    const pct = total > 0 ? Math.round((winnerCount / total) * 100) : 100;
+                    html += `<div class="winner-text">${winner.replace(/_/g, ' ').toUpperCase()} (${pct}%)</div>`;
+                } else {
+                    html += `<div class="winner-text">${winner.replace(/_/g, ' ').toUpperCase()}</div>`;
                 }
-            }
+                html += `</div>`;
+                return html;
+            };
+
+            stageHtml += renderCrewCard("Dancer 1", "d1_char", r.dancers.d1.char, dist.d1_char);
+            stageHtml += renderCrewCard("Dancer 2", "d2_char", r.dancers.d2.char, dist.d2_char);
+
+            const roles = ["drum1", "drum2", "guitar", "bass", "piano", "strings", "winds"];
+            roles.forEach(role => {
+                const char = r.band.members[role];
+                if (char) {
+                    stageHtml += renderCrewCard(role.toUpperCase(), "band", char, dist.band ? dist.band[role] : null);
+                }
+            });
+
+            stageList.innerHTML = stageHtml;
         });
     </script>
 </body>
