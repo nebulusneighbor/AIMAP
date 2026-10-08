@@ -106,10 +106,12 @@ let appState = {
     duration: 45,
     deadline: null,
     auto_mode: false,
-    break_duration: 15,
-    vote_duration: 45,
+    break_duration: 30,
+    vote_duration: 60,
     auto_sequence: [["genre", "environment"], ["humanGuitarTone", "character_skin"], ["tempo", "dance_moves"]],
     auto_index: 0,
+    apply_at: null, // when deferred tempo/tone/visual changes take effect
+    apply_duration: 0,
     global_state: {},
     get serverNow() { return Date.now(); }
 };
@@ -521,6 +523,86 @@ function checkVetoThresholds(p) {
 }
 
 
+const APPLY_DELAY_MS = 12000; // time for a generated file to land in Ableton
+const GENERATION_PARAMS = ['genre', 'instruments'];
+let pendingApply = null; // { timer, updates }
+
+function sendParamOsc(p, winner) {
+    const abletonClient = new Client(oscTargets.ableton.ip, oscTargets.ableton.port);
+    const generatorClient = new Client(oscTargets.generator.ip, oscTargets.generator.port);
+    const unityClient = new Client(oscTargets.unity.ip, oscTargets.unity.port);
+    const feelMapping = {
+        "drive/rock": "Content_Drive",
+        "pulse/hiphop": "Content_Pulse",
+        "groove/funky": "Content_Groove",
+        "elegant/atmospheric": "Content_Elegance"
+    };
+
+    if (p === 'environment') {
+        const envMap = { 'haunted forest': 0, 'mars scape': 1, 'laser grid': 2 };
+        sendOscAsync(unityClient, '/environment/skybox', [envMap[winner] || 0]);
+    } else if (p === 'genre') {
+        sendOscAsync(generatorClient, '/performance/update/genre', [winner, 128, 0, 24, 33, 48, 73]);
+        const g = feelMapping[winner] || "Content_Groove";
+        const inst = globalSessionState['instruments'] || 'full';
+        let progs = [];
+        if(inst === 'full') progs = [128, 0, 24, 33, 48, 73];
+        if(inst === 'rhythm') progs = [128, 33];
+        if(inst === 'acoustic') progs = [0, 48];
+        sendOscAsync(generatorClient, '/web/drum_seeded_request', [g, ...progs]);
+    } else if (p === 'character_skin') {
+        const getSkinIdx = (c) => {
+            if(c==='monsters') return 0;
+            if(c==='robots') return 1;
+            if(c==='aliens') return 2;
+            return 0;
+        };
+        const idx = getSkinIdx(winner);
+        ['dancer1','dancer2','drum1','drum2','guitar','bass','violin','piano','flute'].forEach(av => {
+            sendOscAsync(unityClient, `/avatar/${av}/skin`, [idx]);
+        });
+    } else if (p === 'dance_moves') {
+        sendOscAsync(unityClient, '/avatar/dancer1/move', [winner]);
+        sendOscAsync(unityClient, '/avatar/dancer2/move', [winner]);
+    } else if (p === 'instruments') {
+        const g = feelMapping[globalSessionState['genre']] || "Content_Groove";
+        let progs = [];
+        if(winner === 'full') progs = [128, 0, 24, 33, 48, 73];
+        if(winner === 'rhythm') progs = [128, 33];
+        if(winner === 'acoustic') progs = [0, 48];
+        sendOscAsync(generatorClient, '/web/drum_seeded_request', [g, ...progs]);
+    } else if (p === 'tempo') {
+        sendOscAsync(abletonClient, `/performance/update/${p}`, [parseFloat(winner)]);
+    } else {
+        sendOscAsync(abletonClient, `/performance/update/${p}`, [winner]);
+    }
+
+    setTimeout(() => { abletonClient.close(); generatorClient.close(); unityClient.close(); }, 500);
+}
+
+function applyDeferred() {
+    if (!pendingApply) return;
+    clearTimeout(pendingApply.timer);
+    const { updates } = pendingApply;
+    pendingApply = null;
+    appState.apply_at = null;
+    updates.forEach(({ p, winner }) => {
+        globalSessionState[p] = winner;
+        sendParamOsc(p, winner);
+    });
+    io.emit("aggregator_update", globalSessionState);
+    io.emit("generation_applied");
+}
+
+function scheduleDeferredApply(updates) {
+    // A previous round still waiting gets applied now rather than dropped
+    applyDeferred();
+    appState.apply_duration = APPLY_DELAY_MS;
+    appState.apply_at = Date.now() + APPLY_DELAY_MS;
+    pendingApply = { updates, timer: setTimeout(applyDeferred, APPLY_DELAY_MS) };
+    io.emit("generation_loading", { duration: APPLY_DELAY_MS, remaining: APPLY_DELAY_MS });
+}
+
 function lockCurrentParameter(is_auto) {
     if (freezeTimer) { clearTimeout(freezeTimer); freezeTimer = null; }
     
@@ -587,78 +669,23 @@ function lockCurrentParameter(is_auto) {
         return { p, winner };
     });
 
-    const allToUpdate = [...activeWinners, ...vetoWinners];
-    
-    allToUpdate.forEach(({ p, winner }) => {
-        if (winner !== null) {
-            globalSessionState[p] = winner;
-            
-            const abletonClient = new Client(oscTargets.ableton.ip, oscTargets.ableton.port);
-            const generatorClient = new Client(oscTargets.generator.ip, oscTargets.generator.port);
-            const unityClient = new Client(oscTargets.unity.ip, oscTargets.unity.port);
-            
-            if (p === 'environment') {
-                const envMap = { 'haunted forest': 0, 'mars scape': 1, 'laser grid': 2 };
-                sendOscAsync(unityClient, '/environment/skybox', [envMap[winner] || 0]);
-            } else if (p === 'genre') {
-                sendOscAsync(generatorClient, '/performance/update/genre', [winner, 128, 0, 24, 33, 48, 73]);
-                
-                const feelMapping = {
-                    "drive/rock": "Content_Drive",
-                    "pulse/hiphop": "Content_Pulse",
-                    "groove/funky": "Content_Groove",
-                    "elegant/atmospheric": "Content_Elegance"
-                };
-                const g = feelMapping[winner] || "Content_Groove";
-                const inst = globalSessionState['instruments'] || 'full';
-                let progs = [];
-                if(inst === 'full') progs = [128, 0, 24, 33, 48, 73];
-                if(inst === 'rhythm') progs = [128, 33];
-                if(inst === 'acoustic') progs = [0, 48];
-                sendOscAsync(generatorClient, '/web/drum_seeded_request', [g, ...progs]);
-            } else if (p === 'character_skin') {
-                const getSkinIdx = (c) => {
-                    if(c==='monsters') return 0;
-                    if(c==='robots') return 1;
-                    if(c==='aliens') return 2;
-                    return 0;
-                };
-                const idx = getSkinIdx(winner);
-                ['dancer1','dancer2','drum1','drum2','guitar','bass','violin','piano','flute'].forEach(av => {
-                    sendOscAsync(unityClient, `/avatar/${av}/skin`, [idx]);
-                });
-            } else if (p === 'dance_moves') {
-                sendOscAsync(unityClient, '/avatar/dancer1/move', [winner]);
-                sendOscAsync(unityClient, '/avatar/dancer2/move', [winner]);
-            } else if (p === 'instruments') {
-                const feelMapping = {
-                    "drive/rock": "Content_Drive",
-                    "pulse/hiphop": "Content_Pulse",
-                    "groove/funky": "Content_Groove",
-                    "elegant/atmospheric": "Content_Elegance"
-                };
-                const g = feelMapping[globalSessionState['genre']] || "Content_Groove";
-                let progs = [];
-                if(winner === 'full') progs = [128, 0, 24, 33, 48, 73];
-                if(winner === 'rhythm') progs = [128, 33];
-                if(winner === 'acoustic') progs = [0, 48];
-                sendOscAsync(generatorClient, '/web/drum_seeded_request', [g, ...progs]);
-            } else if (p === 'humanGuitarTone') {
-                sendOscAsync(abletonClient, `/performance/update/${p}`, [winner]);
-            } else if (p === 'tempo') {
-                sendOscAsync(abletonClient, `/performance/update/${p}`, [parseFloat(winner)]);
-            } else {
-                sendOscAsync(abletonClient, `/performance/update/${p}`, [winner]);
-            }
-            
-            setTimeout(() => { abletonClient.close(); generatorClient.close(); unityClient.close(); }, 500);
-        }
+    const allToUpdate = [...activeWinners, ...vetoWinners].filter(u => u.winner !== null);
+
+    // Generation params go out immediately so the new MIDI has time to render and
+    // load into Ableton. Everything else (tempo, guitar tone, visuals) is held for
+    // APPLY_DELAY_MS so it lands at the same moment the generated file is ready.
+    const immediate = allToUpdate.filter(u => GENERATION_PARAMS.includes(u.p));
+    const deferred = allToUpdate.filter(u => !GENERATION_PARAMS.includes(u.p));
+
+    immediate.forEach(({ p, winner }) => {
+        globalSessionState[p] = winner;
+        sendParamOsc(p, winner);
     });
-    
-    // Update UI
-    io.emit("aggregator_update", globalSessionState);
+    if (immediate.length) io.emit("aggregator_update", globalSessionState);
     broadcastVetoDistributions(); // Update veto UI with cleared values
-    
+
+    scheduleDeferredApply(deferred);
+
     // Send performance setup if at the end of the round
     if (appState.auto_mode && appState.auto_index === 2) {
         const abletonClient = new Client(oscTargets.ableton.ip, oscTargets.ableton.port);
@@ -816,8 +843,8 @@ io.on("connection", (socket) => {
             if (data.abletonIP) { oscTargets.ableton.ip = data.abletonIP; oscTargets.generator.ip = data.abletonIP; }
             if (data.unityIP) oscTargets.unity.ip = data.unityIP;
             appState.auto_mode = true;
-            appState.vote_duration = parseInt(data.vote_duration) || 45;
-            appState.break_duration = parseInt(data.break_duration) || 15;
+            appState.vote_duration = parseInt(data.vote_duration) || 60;
+            appState.break_duration = parseInt(data.break_duration) || 30;
             appState.auto_index = 0;
             startSingleVote(appState.auto_sequence[appState.auto_index], appState.vote_duration, true);
         }
@@ -955,6 +982,8 @@ io.on("connection", (socket) => {
             globalClickCount = 0;
             lastCalculatedResults = null;
             vetoVotes = {};
+            if (pendingApply) { clearTimeout(pendingApply.timer); pendingApply = null; }
+            appState.apply_at = null;
             
             if (freezeTimer) { clearTimeout(freezeTimer); freezeTimer = null; }
 
