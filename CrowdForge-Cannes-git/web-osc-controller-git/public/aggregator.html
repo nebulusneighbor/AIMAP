@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CrowdForge - Aggregator View</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .result-box { display: none; animation: fadeIn 1s ease; }
+        .big-number { font-size: 3.5rem; font-weight: 900; color: var(--primary-color); text-shadow: var(--accent-glow); }
+        .live-user-feed { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; max-height: 200px; overflow-y: hidden; }
+        .user-tag { background: rgba(0, 242, 254, 0.15); border: 1px solid var(--primary-color); padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .results-grid-detailed { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; text-align: left; }
+        .detail-card { background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .detail-card h4 { color: var(--primary-color); font-size: 1.8rem; text-transform: uppercase; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+        .detail-val { font-size: 1.2rem; font-weight: 800; color: white; }
+        
+        /* New Chart Styles */
+        .chart-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .chart-label { width: 100px; font-size: 0.6rem; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(255,255,255,0.7); }
+        .chart-bar-bg { flex-grow: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+        .chart-bar-fill { height: 100%; background: var(--secondary-color); transition: width 1s ease; border-radius: 4px; }
+        .chart-percent { width: 35px; font-size: 0.65rem; font-weight: 800; color: var(--primary-color); }
+
+        .chart-container { position: relative; background: rgba(255,255,255,0.02); padding: 40px 10px; border-radius: 16px; margin: 1.5rem 0; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .threshold-line { position: absolute; top: 40px; left: 0; width: 100%; height: 50px; border-bottom: 2px dashed rgba(244, 63, 94, 0.5); pointer-events: none; z-index: 1; }
+        .threshold-label { position: absolute; right: 10px; top: 95px; color: #f43f5e; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; }
+        .bar-wrap { text-align: center; min-width: 140px; position: relative; z-index: 2; }
+        /* Live chart: bars side by side (not stacked) so the chart stays short */
+        .live-chart { display: flex; justify-content: center; align-items: flex-start; gap: 0.75rem; }
+        .live-chart .bar-wrap { min-width: 0; flex: 1 1 0; max-width: 140px; }
+        .live-chart .bar-bg { height: 160px; }
+        .live-chart .bar-wrap p { overflow-wrap: anywhere; font-size: 0.9rem !important; }
+        .bar-bg { height: 100px; width: 35px; background: rgba(255,255,255,0.05); border-radius: 6px; position: relative; margin: auto; overflow: hidden; }
+        .bar-fill { position: absolute; bottom: 0; width: 100%; background: var(--primary-color); transition: height 1.5s ease; }
+        .included-tag { font-size: 0.55rem; color: #10b981; font-weight: 900; margin-top: 5px; opacity: 0; transition: opacity 1s 1.5s; }
+        
+        .mode-section { display: none; margin-top: 2rem; }
+        .ai-section { background: rgba(0,0,0,0.25); border: 1px dashed rgba(255,255,255,0.15); padding: 2rem; border-radius: 24px; margin-top: 3rem; text-align: left; }
+        .ai-badge { background: #f43f5e; color: white; padding: 3px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; vertical-align: middle; margin-right: 10px; }
+        .ai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .ai-item { background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 12px; border-left: 3px solid #f43f5e; }
+        .ai-item h5 { font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; margin-bottom: 4px; }
+        .ai-item div { font-weight: 800; font-size: 0.9rem; color: white; }
+
+        /* Projected stage: fills the screen and never scrolls. Content that would
+           overflow is scaled down by fitToScreen() instead. */
+        html, body { height: 100%; overflow: hidden; }
+        :root { --lane-w: 9vw; }
+        body { padding: 2vh calc(var(--lane-w) + 1vw) 2vh 2vw; }
+        .login-container.stage { width: 100%; max-width: none; height: 96vh; max-height: none; overflow: hidden; padding: 1.5rem 2.5rem; border-radius: 24px; }
+        .stage-top { display: flex; align-items: center; gap: 2rem; margin-bottom: 1rem; }
+
+        /* Parameter strip */
+        .state-strip { display: grid; grid-template-columns: 4fr 3fr; gap: 1.2rem; text-align: left; }
+        .state-group { border: 2px solid var(--group-border); background: var(--group-bg); border-radius: 18px; padding: 1rem; }
+        .state-group.audio  { --group-color: #c084fc; --group-border: rgba(192, 132, 252, 0.5); --group-bg: rgba(192, 132, 252, 0.08); }
+        .state-group.visual { --group-color: #00f2fe; --group-border: rgba(0, 242, 254, 0.45); --group-bg: rgba(0, 242, 254, 0.06); }
+        .state-group-label { color: var(--group-color); font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+        .state-tiles { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.75rem; }
+        .state-tile { position: relative; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.8rem; min-height: 8.5rem; display: flex; flex-direction: column; transition: border-color 0.4s, box-shadow 0.4s; }
+        .state-tile-label { color: var(--group-color); font-size: 1rem; font-weight: 800; text-transform: uppercase; }
+        .state-tile-value { color: white; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; line-height: 1.15; margin-top: 0.3rem; flex-grow: 1; }
+        .state-tile-veto { font-size: 0.95rem; color: #fbbf24; min-height: 1.3em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .state-tile-badge { display: none; position: absolute; top: -0.7rem; right: 0.6rem; background: var(--group-color); color: #0f172a; font-size: 0.75rem; font-weight: 900; padding: 2px 8px; border-radius: 6px; }
+        .state-tile.voting { border-color: var(--group-color); box-shadow: 0 0 20px var(--group-border); }
+        .state-tile.voting .state-tile-badge { display: block; }
+        .state-tile.voting .state-tile-value { opacity: 0.45; }
+
+        /* Emoji lane: a reserved strip on the right edge, so reactions never cover the stage */
+        #reactionLayer { position: fixed; top: 0; bottom: 0; right: 0; width: var(--lane-w); pointer-events: none; z-index: 500; overflow: hidden; }
+        .float-emoji { position: absolute; bottom: 4.5rem; left: 50%; font-size: 3.2rem; animation: emojiRise var(--dur, 3s) ease-out forwards; }
+        @keyframes emojiRise {
+            0%   { transform: translate(-50%, 0) scale(0.5); opacity: 0; }
+            10%  { transform: translate(-50%, -6vh) scale(1); opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--drift, 0px)), -80vh) scale(1.15); opacity: 0; }
+        }
+        .reaction-totals { position: absolute; bottom: 0.8rem; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; font-size: 1.1rem; font-weight: 800; color: rgba(255,255,255,0.8); }
+
+        /* Vote activity: the bar that just gained votes pulses and shows "+n" */
+        .bar-wrap.bump .bar-bg { animation: barBump 1.2s ease-out; }
+        @keyframes barBump {
+            0%   { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.9); }
+            100% { box-shadow: 0 0 0 18px rgba(0, 242, 254, 0); }
+        }
+        .bump-delta { position: absolute; top: -2.2rem; left: 50%; transform: translateX(-50%); font-size: 1.6rem; font-weight: 900; color: var(--primary-color); animation: deltaFade 1.5s ease-out forwards; pointer-events: none; }
+        @keyframes deltaFade {
+            0%   { opacity: 0; transform: translate(-50%, 10px); }
+            20%  { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        /* Middle row: live chart next to the audience panel */
+        .stage-middle { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; min-height: 24rem; }
+        .stage-middle > .detail-card { display: flex; flex-direction: column; min-width: 0; }
+
+        /* Audience presence: meter + every participant's name. Names keep a stable
+           (alphabetical) position and only change colour when they vote; their size
+           shrinks automatically so 100+ names still fit without scrolling. */
+        .presence-meter { display: flex; align-items: center; gap: 1rem; font-size: 1.3rem; font-weight: 800; margin-bottom: 0.8rem; }
+        .names-area { position: relative; flex: 1; min-height: 0; }
+        .names-cloud { position: absolute; inset: 0; overflow: hidden; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 0.35em; font-size: var(--name-size, 1.4rem); }
+        .name-chip { padding: 0.2em 0.6em; border-radius: 999px; font-weight: 800; white-space: nowrap; border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.45); transition: background 0.3s, color 0.3s, border-color 0.3s; }
+        .name-chip.voted { background: var(--primary-color); border-color: var(--primary-color); color: #0f172a; }
+        .presence-bar { flex: 1; height: 1.2rem; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+        .presence-fill { height: 100%; width: 0%; background: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div class="dots"></div>
+    <div id="reactionLayer"><div class="reaction-totals" id="reactionTotals"></div></div>
+    <div class="login-container stage" id="stage">
+        
+        
+                <div id="waitingState" style="text-align: center;">
+            <div id="freezeBanner" style="display:none; background: #ef4444; color: white; padding: 1rem; border-radius: 12px; font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem; animation: pulse 2s infinite;">VOTING CLOSED &mdash; AWAITING LOCK</div>
+            
+            <div class="stage-top">
+                <h1 id="aggQuestionTitle" style="font-size: 3.2rem; color: var(--secondary-color); margin: 0; text-align: left; flex: 1; text-shadow: var(--accent-glow);">WAITING FOR NEXT PARAMETER...</h1>
+                <svg width="150" height="150" viewBox="0 0 200 200" id="timerSvg" style="flex-shrink: 0;">
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"></circle>
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="var(--primary-color)" stroke-width="12" id="timerRing" stroke-dasharray="565" stroke-dashoffset="0" style="transition: stroke-dashoffset 1s linear; transform: rotate(-90deg); transform-origin: center;"></circle>
+                    <text x="100" y="115" text-anchor="middle" font-size="3rem" font-weight="900" fill="var(--primary-color)" id="timerText" style="font-variant-numeric: tabular-nums;">00:00</text>
+                </svg>
+            </div>
+            
+            <div class="stage-middle">
+                <div class="detail-card">
+                    <h4 id="liveDistTitle" style="font-size: 2rem; text-align: center; color: var(--primary-color);">Live Distribution</h4>
+                    <div class="chart-container" style="min-height: 200px; padding: 2rem 1rem; flex: 1; flex-wrap: nowrap;">
+                        <div id="liveDist" style="display: contents;"></div>
+                    </div>
+                </div>
+                <div class="detail-card" style="text-align: left;">
+                    <h4>Audience</h4>
+                    <div class="presence-meter">
+                        <span>✅ <span id="votedCount">0</span> voted</span>
+                        <div class="presence-bar"><div class="presence-fill" id="presenceFill"></div></div>
+                        <span style="opacity: 0.6;">⏳ <span id="decidingCount">0</span> deciding</span>
+                    </div>
+                    <div class="names-area"><div class="names-cloud" id="namesCloud"></div></div>
+                </div>
+            </div>
+
+            <!-- Static strip of every parameter: tiles never move, the ones being voted on light up -->
+            <div class="state-strip">
+                <div class="state-group audio">
+                    <div class="state-group-label">🎵 Music</div>
+                    <div class="state-tiles" id="audioTiles"></div>
+                </div>
+                <div class="state-group visual">
+                    <div class="state-group-label">🌌 Visual</div>
+                    <div class="state-tiles" id="visualTiles"></div>
+                </div>
+            </div>
+
+<!-- Keep activityTicker hidden in DOM so JS doesn't error -->
+            <div id="activityTicker" style="display: none;"></div>
+        </div>
+        </div>
+
+        <div id="resultsView" class="result-box">
+            <h1 style="font-size: 4rem; margin-bottom: 2rem; color: var(--primary-color);">FINAL RESULTS</h1>
+            
+            <!-- VOTED AUDIO RESULTS -->
+            <div id="audioResults" class="mode-section">
+                <div class="results-grid-detailed">
+                    <div class="detail-card">
+                        <h4>Musical Feel Distribution</h4>
+                        <div class="chart-container" style="padding: 1rem 0.5rem; margin: 0.5rem 0; min-height: 120px;">
+                            <div class="threshold-line" style="top: 10px; height: 50px;"></div>
+                            <div id="resGenreChart" style="display: contents;"></div>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <h4>Musical Mode Distribution</h4>
+                        <div class="chart-container" style="padding: 1rem 0.5rem; margin: 0.5rem 0; min-height: 120px;">
+                            <div class="threshold-line" style="top: 10px; height: 50px;"></div>
+                            <div id="resModeChart" style="display: contents;"></div>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <h4>Human Guitar Tone</h4>
+                        <div class="chart-container" style="padding: 1rem 0.5rem; margin: 0.5rem 0; min-height: 120px;">
+                            <div class="threshold-line" style="top: 10px; height: 50px;"></div>
+                            <div id="resToneChart" style="display: contents;"></div>
+                        </div>
+                    </div>
+                </div>
+                <h3 style="margin-top: 2.5rem; text-align: left;">Avatar Instrument Mix (50% Threshold)</h3>
+                <div class="chart-container">
+                    <div class="threshold-line"></div><div class="threshold-label">Included &uarr;</div>
+                    <div id="resInstruments" style="display: contents;"></div>
+                </div>
+            </div>
+
+            <!-- VOTED VISUAL RESULTS -->
+            <div id="visualResults" class="mode-section">
+                <div class="results-grid-detailed" style="margin-bottom: 1.5rem;">
+                    <div class="detail-card">
+                        <h4>Environment Distribution</h4>
+                        <div class="chart-container">
+                            <div class="threshold-line"></div><div class="threshold-label">Included &uarr;</div>
+                            <div id="resEnvChart" style="display: contents;"></div>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <h4>Dancer 1 Moves</h4>
+                        <div class="chart-container">
+                            <div class="threshold-line"></div><div class="threshold-label">Included &uarr;</div>
+                            <div id="resD1Chart" style="display: contents;"></div>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <h4>Dancer 2 Moves</h4>
+                        <div class="chart-container">
+                            <div class="threshold-line"></div><div class="threshold-label">Included &uarr;</div>
+                            <div id="resD2Chart" style="display: contents;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-card">
+                    <h4>Band Avatar Configurations</h4>
+                    <div id="resBandMembers" style="font-size: 0.75rem; line-height: 1.5; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;"></div>
+                </div>
+            </div>
+
+            <!-- AI DIRECTED SECTIONS -->
+            <div id="aiAudioSection" class="ai-section" style="display:none;">
+                <h3><span class="ai-badge">AI BAND</span> MUSICAL PARAMETERS</h3>
+                <div id="aiAudioList" class="ai-grid"></div>
+            </div>
+
+            <div id="aiVisualSection" class="ai-section" style="display:none;">
+                <h3><span class="ai-badge">AI BAND</span> VISUAL ENVIRONMENT</h3>
+                <div id="aiVisualList" class="ai-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        
+        const paramNames = {
+            'genre': 'Audio Feel',
+            'environment': 'Environment',
+            'humanGuitarTone': 'Guitar Tone',
+            'character_skin': 'Character Skin',
+            'instruments': 'Instruments',
+            'dance_moves': 'Dance Moves',
+            'tempo': 'Tempo'
+        };
+
+        
+        const paramGroups = {
+            audio:  { color: '#c084fc', params: ['genre', 'humanGuitarTone', 'instruments', 'tempo'] },
+            visual: { color: '#00f2fe', params: ['environment', 'character_skin', 'dance_moves'] }
+        };
+        const groupOf = p => Object.keys(paramGroups).find(k => paramGroups[k].params.includes(p));
+        const formatValue = (p, v) => (v === undefined || v === null || v === '') ? '—' : (p === 'tempo' ? `${v} BPM` : String(v));
+
+        // Build the parameter tiles once; afterwards only their text/classes change,
+        // so the layout stays fixed for the whole performance.
+        Object.entries(paramGroups).forEach(([key, g]) => {
+            const container = document.getElementById(key + 'Tiles');
+            g.params.forEach(p => {
+                const tile = document.createElement('div');
+                tile.className = 'state-tile';
+                tile.id = 'tile_' + p;
+                tile.innerHTML = `
+                    <div class="state-tile-badge">VOTING NOW</div>
+                    <div class="state-tile-label"></div>
+                    <div class="state-tile-value">—</div>
+                    <div class="state-tile-veto"></div>`;
+                tile.querySelector('.state-tile-label').textContent = paramNames[p] || p;
+                container.appendChild(tile);
+            });
+        });
+
+        function updateStateTiles(globalState, votingParams) {
+            Object.values(paramGroups).forEach(g => g.params.forEach(p => {
+                const tile = document.getElementById('tile_' + p);
+                tile.querySelector('.state-tile-value').textContent = formatValue(p, globalState[p]);
+                tile.classList.toggle('voting', votingParams.includes(p));
+            }));
+        }
+
+        // Scale the waiting/voting view down so it always fits the projector
+        // without scrolling (nobody touches the aggregator during the show).
+        const stage = document.getElementById('stage');
+        const fitTarget = document.getElementById('waitingState');
+        let fitQueued = false;
+        function fitToScreen() {
+            fitQueued = false;
+            const cs = getComputedStyle(stage);
+            const avail = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+            fitTarget.style.zoom = 1;
+            const need = fitTarget.getBoundingClientRect().height;
+            fitTarget.style.zoom = need > avail ? (avail / need).toFixed(3) : 1;
+        }
+        function queueFit() {
+            if (fitQueued) return;
+            fitQueued = true;
+            requestAnimationFrame(fitToScreen);
+        }
+        window.addEventListener('resize', queueFit);
+        new MutationObserver(muts => {
+            if (muts.some(m => m.target !== fitTarget)) queueFit();
+        }).observe(fitTarget, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class', 'style'] });
+        queueFit();
+
+        // Emoji reactions arrive as batches of counts ({ "❤️": 12, "🔥": 3 }).
+        // Totals are exact; the floating emojis are capped so 100 phones stay smooth.
+        socket.on("connect", () => socket.emit("join_displays"));
+        const reactionLayer = document.getElementById('reactionLayer');
+        const reactionTotalsEl = document.getElementById('reactionTotals');
+        const MAX_FLOATERS = 40;
+        const MAX_PER_BATCH = 6;
+        let reactionTotals = {};
+
+        function renderReactionTotals() {
+            reactionTotalsEl.innerHTML = '';
+            Object.entries(reactionTotals).sort((a, b) => b[1] - a[1]).forEach(([emoji, n]) => {
+                const row = document.createElement('div');
+                row.textContent = `${emoji} ${n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n}`;
+                reactionTotalsEl.appendChild(row);
+            });
+        }
+
+        function spawnEmoji(emoji) {
+            if (reactionLayer.querySelectorAll('.float-emoji').length >= MAX_FLOATERS) return;
+            const el = document.createElement('div');
+            el.className = 'float-emoji';
+            el.textContent = emoji;
+            const dur = 2.5 + Math.random() * 1.5;
+            el.style.setProperty('--dur', dur + 's');
+            el.style.setProperty('--drift', (Math.random() * 3 - 1.5) + 'vw');
+            reactionLayer.appendChild(el);
+            setTimeout(() => el.remove(), dur * 1000 + 100);
+        }
+
+        socket.on("reactions", batch => {
+            let budget = MAX_PER_BATCH;
+            Object.entries(batch).forEach(([emoji, n]) => {
+                reactionTotals[emoji] = (reactionTotals[emoji] || 0) + n;
+                for (let i = 0; i < n && budget > 0; i++, budget--) {
+                    setTimeout(() => spawnEmoji(emoji), Math.random() * 250);
+                }
+            });
+            renderReactionTotals();
+        });
+
+        let timerInterval;
+        let ringCircumference = 565; // 2 * pi * 90
+
+        socket.on("phase_change", state => {
+            if (state.phase === 'results') {
+                document.getElementById('waitingState').style.display = 'none';
+                return;
+            } else {
+                document.getElementById('waitingState').style.display = 'block';
+                document.getElementById('resultsView').style.display = 'none';
+            }
+
+            const titleEl = document.getElementById('aggQuestionTitle');
+            if (state.current_question && state.phase !== 'break') {
+                const qArr = Array.isArray(state.current_question) ? state.current_question : [state.current_question];
+                titleEl.textContent = qArr.map(q => (paramNames[q] || q).toUpperCase()).join(" & ");
+                document.getElementById('liveDistTitle').textContent = `Live Distribution`;
+            } else {
+                titleEl.textContent = state.phase === 'break' ? "NEXT PARAMETER IN..." : "WAITING FOR NEXT PARAMETER...";
+                document.getElementById('liveDistTitle').textContent = "Current State";
+                
+                // Show current state instead of empty
+                if (state.global_state) {
+                    const s = state.global_state;
+                    document.getElementById('liveDist').innerHTML = `
+                        <div style="font-size: 1.5rem; line-height: 2; color: white; text-align: center;">
+                            <span style="color:var(--primary-color)">GENRE:</span> ${s.genre ? s.genre.toUpperCase() : '-'} &nbsp;&bull;&nbsp;
+                            <span style="color:var(--primary-color)">ENV:</span> ${s.environment ? s.environment.toUpperCase() : '-'} <br>
+                            <span style="color:var(--primary-color)">TONE:</span> ${s.humanGuitarTone ? s.humanGuitarTone.toUpperCase() : '-'} &nbsp;&bull;&nbsp;
+                            <span style="color:var(--primary-color)">SKIN:</span> ${s.character_skin ? s.character_skin.toUpperCase() : '-'} <br>
+                            <span style="color:var(--primary-color)">INST:</span> ${s.instruments ? s.instruments.toUpperCase() : '-'} &nbsp;&bull;&nbsp;
+                            <span style="color:var(--primary-color)">DANCE:</span> ${s.dance_moves ? s.dance_moves.toUpperCase() : '-'} <br>
+                            <span style="color:var(--primary-color)">TEMPO:</span> ${s.tempo ? s.tempo + ' BPM' : '-'}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('liveDist').innerHTML = '';
+                }
+            }
+            
+            if (state.global_state) {
+                const incomingParams = (state.phase === 'active' || state.phase === 'frozen')
+                    ? (Array.isArray(state.current_question) ? state.current_question : (state.current_question ? [state.current_question] : []))
+                    : [];
+                updateStateTiles(state.global_state, incomingParams);
+            }
+
+            if (state.phase === 'frozen') {
+                document.getElementById('freezeBanner').style.display = 'block';
+                document.getElementById('timerSvg').style.opacity = '0.3';
+            } else {
+                document.getElementById('freezeBanner').style.display = 'none';
+                document.getElementById('timerSvg').style.opacity = '1';
+            }
+
+            clearInterval(timerInterval);
+            if (state.deadline && (state.phase === 'active' || state.phase === 'frozen' || state.phase === 'break')) {
+                const totalDur = (state.duration || 60) * 1000;
+                const updateTime = () => {
+                    const diff = Math.max(0, state.deadline - Date.now());
+                    const s = Math.ceil(diff / 1000);
+                    const min = Math.floor(s / 60).toString().padStart(2, '0');
+                    const sec = (s % 60).toString().padStart(2, '0');
+                    const textEl = document.getElementById('timerText');
+                    textEl.textContent = `${min}:${sec}`;
+                    
+                    if (s <= 10 && s > 0 && state.phase === 'active') {
+                        document.getElementById('timerRing').style.stroke = '#ef4444';
+                        textEl.style.fill = '#ef4444';
+                        const svg = document.getElementById('timerSvg');
+                        svg.style.animation = 'none';
+                        void svg.offsetWidth;
+                        svg.style.animation = 'pulseSync 0.9s ease-out';
+                    } else {
+                        document.getElementById('timerRing').style.stroke = 'var(--primary-color)';
+                        textEl.style.fill = 'var(--primary-color)';
+                        document.getElementById('timerSvg').style.animation = 'none';
+                    }
+
+                    const pct = Math.max(0, diff / totalDur);
+                    document.getElementById('timerRing').style.strokeDashoffset = ringCircumference - (pct * ringCircumference);
+
+                    if (diff <= 0) clearInterval(timerInterval);
+                };
+                updateTime();
+                timerInterval = setInterval(updateTime, 1000);
+            }
+        });
+
+        // ---- Audience names ----
+        const namesCloud = document.getElementById('namesCloud');
+        const nameChips = new Map(); // username -> chip element
+        let lastNameKey = '';
+
+        function renderPresence(voted, deciding) {
+            const votedSet = new Set(voted);
+            const all = [...new Set([...voted, ...deciding])]
+                .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+            document.getElementById('votedCount').textContent = voted.length;
+            document.getElementById('decidingCount').textContent = all.length - voted.length;
+            document.getElementById('presenceFill').style.width = (all.length ? (voted.length / all.length) * 100 : 0) + '%';
+
+            // Rebuild only when the set of people changes; otherwise just recolour
+            const key = all.join('\u0000');
+            if (key !== lastNameKey) {
+                lastNameKey = key;
+                nameChips.clear();
+                namesCloud.innerHTML = '';
+                all.forEach(u => {
+                    const chip = document.createElement('span');
+                    chip.className = 'name-chip';
+                    chip.textContent = u; // textContent: names are user input
+                    nameChips.set(u, chip);
+                    namesCloud.appendChild(chip);
+                });
+                fitNames();
+            }
+            nameChips.forEach((chip, u) => chip.classList.toggle('voted', votedSet.has(u)));
+        }
+
+        // Largest name size (in px) at which every chip fits in the panel
+        function fitNames() {
+            let lo = 9, hi = 30;
+            namesCloud.style.setProperty('--name-size', hi + 'px');
+            if (namesCloud.scrollHeight <= namesCloud.clientHeight) return;
+            while (hi - lo > 0.5) {
+                const mid = (lo + hi) / 2;
+                namesCloud.style.setProperty('--name-size', mid + 'px');
+                if (namesCloud.scrollHeight <= namesCloud.clientHeight) lo = mid; else hi = mid;
+            }
+            namesCloud.style.setProperty('--name-size', lo + 'px');
+        }
+        // Re-fit whenever the panel's box changes (layout settling, window resize)
+        let namesFitQueued = false;
+        new ResizeObserver(() => {
+            if (namesFitQueued) return;
+            namesFitQueued = true;
+            requestAnimationFrame(() => { namesFitQueued = false; fitNames(); });
+        }).observe(namesCloud);
+
+        // Remember the last tally so we can highlight options that just gained votes
+        let prevTally = {};
+        function bumpGainedBars(q, dist) {
+            const prev = prevTally[q] || {};
+            document.querySelectorAll(`#chart_${q} .bar-wrap`).forEach(bar => {
+                const gained = (dist[bar.dataset.val] || 0) - (prev[bar.dataset.val] || 0);
+                if (gained <= 0) return;
+                bar.classList.add('bump');
+                const d = document.createElement('div');
+                d.className = 'bump-delta';
+                d.textContent = '+' + gained;
+                bar.appendChild(d);
+            });
+            prevTally[q] = { ...dist };
+        }
+
+        socket.on("live_tally", data => {
+            renderPresence(data.voted || [], data.deciding || []);
+            if (data.phase !== 'active' && data.phase !== 'frozen') return;
+
+            const container = document.getElementById('liveDist');
+            container.innerHTML = '';
+
+            const qArr= Array.isArray(data.current_question) ? data.current_question : (data.current_question ? [data.current_question] : []);
+            
+            qArr.forEach(q => {
+                const wrapper = document.createElement('div');
+                wrapper.style.flex = '1 1 0';
+                wrapper.style.minWidth = '0';
+                wrapper.style.height = '100%';
+                
+                const title = document.createElement('h3');
+                title.style.textAlign = 'center';
+                title.style.color = 'var(--secondary-color)';
+                title.style.marginBottom = '15px';
+                title.style.fontSize = '1.5rem';
+                title.textContent = (paramNames[q] || q).toUpperCase();
+                wrapper.appendChild(title);
+                
+                const chartDiv = document.createElement('div');
+                chartDiv.id = 'chart_' + q;
+                chartDiv.className = 'live-chart';
+                wrapper.appendChild(chartDiv);
+                container.appendChild(wrapper);
+                
+                if (q === 'tempo') {
+                    chartDiv.innerHTML = `<div style="font-size: 3rem; color: white; font-weight: 900; text-align: center; width: 100%; margin-top: 2rem;">${data.tempo} BPM</div>`;
+                } else if (data.distributions[q]) {
+                    renderVerticalChart('chart_' + q, data.distributions[q], data.count);
+                    bumpGainedBars(q, data.distributions[q]);
+                }
+            });
+
+});
+
+        
+        socket.on("veto_distribution", dists => {
+            for (let p in dists) {
+                const tile = document.getElementById('tile_' + p);
+                if (!tile) continue;
+                const pDist = dists[p];
+                const keys = Object.keys(pDist).filter(k => pDist[k] > 0).sort((a, b) => pDist[b] - pDist[a]);
+                // One line only, so the tile never grows
+                tile.querySelector('.state-tile-veto').textContent = keys.length
+                    ? '⚡ ' + keys.slice(0, 2).map(k => `${formatValue(p, k)} (${pDist[k]})`).join(' · ')
+                    : '';
+            }
+        });
+
+        socket.on("vote_activity", data => {
+            const ticker = document.getElementById('activityTicker');
+            const div = document.createElement('div');
+            div.style.animation = "popIn 0.5s ease";
+            div.innerHTML = `<span style="color:var(--primary-color);font-weight:bold">${data.username}</span> &rarr; ${data.field}: ${data.value}`;
+            ticker.prepend(div);
+            if (ticker.children.length > 10) ticker.removeChild(ticker.lastChild);
+        });
+
+
+        socket.on("aggregator_reset", () => {
+            reactionTotals = {};
+            renderReactionTotals();
+            prevTally = {};
+            document.getElementById('waitingState').style.display = 'block';
+            document.getElementById('resultsView').style.display = 'none';
+            document.querySelectorAll('.mode-section, .ai-section').forEach(s => s.style.display = 'none');
+        });
+
+        function renderVoteChart(containerId, data, total) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            if (!data || Object.keys(data).length === 0) {
+                container.innerHTML = '<div style="opacity:0.3; font-size:0.7rem; padding:10px;">Waiting for data...</div>';
+                return;
+            }
+            const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+            sorted.forEach(([label, count]) => {
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                let displayLabel = label.toUpperCase().replace(/\//g, ' / ').replace(/_/g, ' ');
+                if (displayLabel === "1") displayLabel = "CLEAN";
+                if (displayLabel === "2") displayLabel = "RAGING";
+                if (displayLabel === "3") displayLabel = "ETHEREAL";
+                
+                container.innerHTML += `
+                    <div class="chart-row">
+                        <div class="chart-label" title="${displayLabel}">${displayLabel}</div>
+                        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: ${pct}%"></div></div>
+                        <div class="chart-percent">${pct}%</div>
+                    </div>`;
+            });
+        }
+
+        function renderVerticalChart(containerId, data, total, winnerValue = null) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+
+            // SYNTHETIC FALLBACK: If no data but we have a winner, create a 100% bar for that winner
+            if ((!data || Object.keys(data).length === 0) && winnerValue) {
+                data = { [winnerValue]: total };
+            }
+
+            if (!data || Object.keys(data).length === 0) {
+                container.innerHTML = '<div style="opacity:0.3; font-size:0.7rem; padding:40px 10px;">Waiting for data...</div>';
+                return;
+            }
+            Object.entries(data).forEach(([label, count]) => {
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                
+                let included = false;
+                if (winnerValue !== null) {
+                    // Only the resolved winner gets the tag
+                    included = (String(label) === String(winnerValue));
+                } else {
+                    // Fallback to 50% if no winner provided (e.g. instruments)
+                    included = pct >= 50;
+                }
+
+                let displayLabel = label.toUpperCase().replace(/_/g, ' ').replace(/\//g, ' / ');
+                
+                if (displayLabel === "1") displayLabel = "CLEAN";
+                if (displayLabel === "2") displayLabel = "RAGING";
+                if (displayLabel === "3") displayLabel = "ETHEREAL";
+                
+                container.innerHTML += `
+                    <div class="bar-wrap" data-val="${String(label).replace(/"/g, '&quot;')}">
+                        <div class="bar-bg"><div class="bar-fill" style="height: ${pct}%; background: ${included ? 'var(--primary-color)' : 'rgba(255,255,255,0.2)'}"></div></div>
+                        <p style="font-size: 1.0rem; text-transform: uppercase; margin-top: 8px; font-weight: 700; white-space: normal; line-height: 1.2; max-width: 140px; margin-left: auto; margin-right: auto;" title="${displayLabel}">${displayLabel}</p>
+                        <div class="included-tag" style="opacity: ${included ? 1 : 0}">INCLUDED</div>
+                    </div>`;
+            });
+        }
+
+        socket.on("results_ready", r => {
+            if (!r) return;
+            document.getElementById('waitingState').style.display = 'none';
+            document.getElementById('resultsView').style.display = 'block';
+
+            const mode = r.mode;
+            const dist = r.distributions || {};
+            const total = r.count;
+
+            // 1. Handle Voted Sections
+            if (mode === 'audio' || mode === 'both') {
+                document.getElementById('audioResults').style.display = 'block';
+                renderVerticalChart('resGenreChart', dist.genre, total, r.genre);
+                renderVerticalChart('resModeChart', dist.mode, total, r.mode_val);
+                renderVerticalChart('resToneChart', dist.tone, total, r.humanGuitarTone);
+
+                const fxLabels = { "dist": "Distortion", "echo": "Echo", "airy": "Airy Chorus", "reverb": "Reverb", "chorus": "Chorus", "phaser": "Phaser", "none": "None", "default": "Default" };
+                const instDiv = document.getElementById('resInstruments');
+                instDiv.innerHTML = '';
+                for (let [name, count] of Object.entries(r.instruments)) {
+                    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                    const included = pct >= 50;
+                    const fxVal = r.fx_choices ? r.fx_choices[name] : "none";
+                    const fxLabel = fxLabels[fxVal] || fxVal;
+
+                    instDiv.innerHTML += `
+                        <div class="bar-wrap">
+                            <div style="font-size: 0.55rem; color: var(--secondary-color); font-weight: 800; margin-bottom: 5px; height: 1.2rem; display: flex; align-items: center; justify-content: center;">${fxLabel.toUpperCase()}</div>
+                            <div class="bar-bg"><div class="bar-fill" style="height: ${pct}%; background: ${included ? 'var(--primary-color)' : 'rgba(255,255,255,0.2)'}"></div></div>
+                            <p style="font-size: 0.65rem; text-transform: uppercase; margin-top: 8px; font-weight: 700;">${name}</p>
+                            <div class="included-tag" style="opacity: ${included ? 1 : 0}">INCLUDED</div>
+                        </div>`;
+                }
+            }
+
+            if (mode === 'visual' || mode === 'both') {
+                document.getElementById('visualResults').style.display = 'block';
+                renderVerticalChart('resEnvChart', dist.environment, total, r.environment);
+                renderVerticalChart('resD1Chart', dist.d1_move, total, r.dancers.d1.move);
+                renderVerticalChart('resD2Chart', dist.d2_move, total, r.dancers.d2.move);
+                
+                const bMem = document.getElementById('resBandMembers');
+                bMem.innerHTML = '';
+                const roles = ["drum1", "drum2", "guitar", "bass", "piano", "strings", "winds"];
+                
+                roles.forEach(role => {
+                    const countMap = dist.band ? dist.band[role] : null;
+                    bMem.innerHTML += `
+                        <div class="detail-card">
+                            <h4>${role.toUpperCase()}</h4>
+                            <div class="chart-container" style="min-height: 120px;">
+                                <div class="threshold-line"></div>
+                                <div id="chart_${role}" style="display: contents;"></div>
+                            </div>
+                        </div>`;
+                });
+
+                // Render the charts in a second pass after the containers exist
+                setTimeout(() => {
+                    roles.forEach(role => {
+                        const countMap = dist.band ? dist.band[role] : null;
+                        const winner = r.band.members[role];
+                        renderVerticalChart(`chart_${role}`, countMap, total, winner);
+                    });
+                }, 0);
+            }
+
+            // 2. Handle AI Directed Sections (Show whenever randomization occurred)
+            const safeUpper = (val) => val ? String(val).toUpperCase() : "RANDOMIZED";
+            const fxLabels = { "dist": "Distortion", "echo": "Echo", "airy": "Airy Chorus", "reverb": "Reverb", "chorus": "Chorus", "phaser": "Phaser", "none": "None", "default": "Default" };
+
+            // A. AI AUDIO SECTION
+            if (r.ai_audio || mode === 'visual' || (mode === 'both' && (!dist.genre || Object.keys(dist.genre).length === 0))) {
+                document.getElementById('aiAudioSection').style.display = 'block';
+                const list = document.getElementById('aiAudioList');
+                
+                const instsWithFx = Object.entries(r.instruments || {})
+                    .filter(([name, count]) => count >= (total / 2))
+                    .map(([name]) => {
+                        const fx = r.fx_choices[name] || "default";
+                        return `${name.toUpperCase()} (${fxLabels[fx].toUpperCase()})`;
+                    })
+                    .join(", ");
+
+                list.innerHTML = `
+                    <div class="ai-item"><h5>TOP FEEL</h5><div>${safeUpper(r.genre)}</div></div>
+                    <div class="ai-item"><h5>MUSICAL MODE</h5><div>${safeUpper(r.mode_val)}</div></div>
+                    <div class="ai-item"><h5>TEMPO</h5><div>${r.tempo || 115} BPM</div></div>
+                    <div class="ai-item"><h5>GUITAR TONE</h5><div>${r.humanGuitarTone === "1" ? "CLEAN" : (r.humanGuitarTone === "2" ? "RAGING" : "ETHEREAL")}</div></div>
+                    <div class="ai-item" style="grid-column: 1 / -1"><h5>AI BAND INSTRUMENT MIX + FX</h5><div>${instsWithFx || "NONE"}</div></div>
+                `;
+            }
+
+            // B. AI VISUAL SECTION
+            if (r.ai_visual || mode === 'audio' || (mode === 'both' && (!dist.environment || Object.keys(dist.environment).length === 0))) {
+                document.getElementById('aiVisualSection').style.display = 'block';
+                const list = document.getElementById('aiVisualList');
+                
+                let html = `
+                    <div class="ai-item"><h5>ENVIRONMENT</h5><div>${safeUpper(r.environment)}</div></div>
+                    <div class="ai-item"><h5>DANCER 1</h5><div>${safeUpper(r.dancers.d1.char).replace(/_/g, ' ')} (${safeUpper(r.dancers.d1.move)})</div></div>
+                    <div class="ai-item"><h5>DANCER 2</h5><div>${safeUpper(r.dancers.d2.char).replace(/_/g, ' ')} (${safeUpper(r.dancers.d2.move)})</div></div>
+                `;
+
+                // Add Band Members that were AI randomized
+                Object.entries(r.band.members || {}).forEach(([role, char]) => {
+                    // Only show in AI section if the audience didn't vote for it
+                    const roleDist = dist.band ? dist.band[role] : null;
+                    if (!roleDist || Object.keys(roleDist).length === 0) {
+                        html += `<div class="ai-item"><h5>${role.toUpperCase()}</h5><div>${safeUpper(char).replace(/_/g, ' ')}</div></div>`;
+                    }
+                });
+
+                list.innerHTML = html;
+            }
+        });
+    </script>
+</body>
+</html>

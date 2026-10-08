@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CrowdForge - Admin Console</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; text-align: left; }
+        .stat-card { background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-red { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); color: white; }
+        .btn-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .btn-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+        .ip-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--primary-color); padding: 5px 10px; border-radius: 5px; font-family: monospace; font-size: 0.8rem; margin-bottom: 5px; width: 120px; }
+    </style>
+</head>
+<body>
+    <div class="dots"></div>
+    <div class="login-container" style="max-width: 900px;">
+        <h1>CrowdForge ADMIN</h1>
+        
+        <div class="admin-grid">
+            <div class="stat-card">
+                <h3>Control Phase</h3>
+                <label>Target IP Addresses</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                    <div><span style="font-size:0.6rem; display:block">ABLETON IP</span><input type="text" id="abletonIP" class="ip-input" value="127.0.0.1"></div>
+                    <div><span style="font-size:0.6rem; display:block">UNITY IP</span><input type="text" id="unityIP" class="ip-input" value="127.0.0.1"></div>
+                </div>
+
+                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 10px; color: var(--primary-color);">AUTO-PILOT MODE</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                        <div style="flex: 1;">
+                            <label>Vote Duration (s)</label>
+                            <input type="number" id="autoVoteDur" value="30" style="width: 100%; padding: 0.8rem; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Break Duration (s)</label>
+                            <input type="number" id="autoBreakDur" value="10" style="width: 100%; padding: 0.8rem; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="sendCommand('start_auto_cycle')" style="background: var(--primary-color); color: #0f172a;">START AUTO-PILOT</button>
+                        <button onclick="sendCommand('stop_auto_cycle')" style="background: #ef4444;">STOP AUTO-PILOT</button>
+                    </div>
+                </div>
+
+                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px;">
+                    <h3 style="margin-bottom: 10px;">MANUAL OVERRIDE</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                        <div style="flex: 1;">
+                            <label>Parameter</label>
+                            <select id="paramSelect">
+                                <option value='["genre","environment"]'>Round 1: Genre + Environment</option>
+                                <option value='["humanGuitarTone","character_skin"]'>Round 2: Tone + Skin</option>
+                                <option value='["instruments","dance_moves"]'>Round 3: Instruments + Dance</option>
+                                <option value='["tempo"]'>Round 4: Tempo</option>
+                            </select>
+                        </div>
+                        <div style="width: 100px;">
+                            <label>Duration (s)</label>
+                            <input type="number" id="durationInput" value="30" style="width: 100%; padding: 0.8rem; border-radius: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                        </div>
+                    </div>
+                    <button onclick="sendCommand('start_vote')" style="margin-top: 0.5rem; background: rgba(255,255,255,0.1);">START MANUAL VOTE</button>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button id="extendBtn" onclick="sendCommand('extend_time')" class="btn-disabled" style="font-size: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.1);">+15s</button>
+                        <button id="restartBtn" onclick="sendCommand('restart_time')" class="btn-disabled" style="font-size: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.1);">Restart Timer</button>
+                    </div>
+                    <button onclick="sendCommand('lock_single_parameter')" style="margin-top: 1rem; background: var(--secondary-color);">LOCK & UPDATE</button>
+                </div>
+                
+                <button onclick="sendCommand('reset')" class="btn-red" style="margin-top: 2rem; font-size: 0.8rem; padding: 0.5rem;">RESET ALL</button>
+            </div>
+
+            <div class="stat-card">
+                <h3>Live Status</h3>
+                <p>Status: <span id="statusText" style="color: var(--secondary-color); font-weight: 800;">LOBBY</span></p>
+                <p>Timer: <span id="adminTimer" style="color: var(--primary-color); font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums;">--:--</span></p>
+                <p style="margin-top: 1rem;">Voted: <span id="votedCount" style="color: #10b981; font-size: 1.5rem; font-weight: 900;">0</span> / Deciding: <span id="decidingCount" style="color: #f59e0b; font-size: 1.5rem; font-weight: 900;">0</span></p>
+                <div id="recentLog" style="font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 1.5rem; height: 150px; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.on("connect", () => socket.emit("join_displays"));
+        const initBtn = document.getElementById('initBtn');
+        const extendBtn = document.getElementById('extendBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        
+        function sendCommand(cmd) {
+            let param = document.getElementById('paramSelect').value;
+            try { param = JSON.parse(param); } catch(e) {}
+            const abletonIP = document.getElementById('abletonIP').value;
+            const unityIP = document.getElementById('unityIP').value;
+            const duration = document.getElementById('durationInput').value;
+            const autoVoteDur = document.getElementById('autoVoteDur').value;
+            const autoBreakDur = document.getElementById('autoBreakDur').value;
+            socket.emit('admin_command', { 
+                command: cmd, 
+                parameter: param,
+                duration: duration,
+                vote_duration: autoVoteDur,
+                break_duration: autoBreakDur,
+                abletonIP: abletonIP,
+                unityIP: unityIP
+            });
+        }
+
+        socket.on("live_tally", data => {
+            document.getElementById('votedCount').textContent = data.voted ? data.voted.length : 0;
+            document.getElementById('decidingCount').textContent = data.deciding ? data.deciding.length : 0;
+        });
+        
+        socket.on("vote_activity", data => {
+            const log = document.getElementById('recentLog');
+            const div = document.createElement('div');
+            div.innerHTML = `<b>${data.username}</b> &rarr; ${data.field}: ${data.value}`;
+            log.insertBefore(div, log.firstChild);
+        });
+
+        socket.on("results_ready", () => {
+            initBtn.classList.remove('btn-disabled');
+            document.getElementById('statusText').textContent = "RESULTS READY";
+        });
+
+        socket.on("performance_started", () => {
+            initBtn.style.boxShadow = "0 0 30px #10b981";
+            document.getElementById('statusText').textContent = "PERFORMING";
+        });
+
+        let adminInterval;
+        socket.on("phase_change", state => {
+            document.getElementById('statusText').textContent = state.phase.toUpperCase();
+            
+            if (state.phase === 'active') {
+                extendBtn.classList.remove('btn-disabled');
+                restartBtn.classList.remove('btn-disabled');
+            } else {
+                extendBtn.classList.add('btn-disabled');
+                restartBtn.classList.add('btn-disabled');
+            }
+
+            if (state.phase === 'lobby') {
+                initBtn.classList.add('btn-disabled');
+                initBtn.style.boxShadow = "none";
+                document.getElementById('votedCount').textContent = "0";
+                document.getElementById('decidingCount').textContent = "0";
+                document.getElementById('recentLog').innerHTML = "";
+            }
+            
+            clearInterval(adminInterval);
+            if (state.phase === 'break') {
+                document.getElementById('statusText').textContent = 'AUTO-BREAK';
+                document.getElementById('statusText').style.color = '#eab308';
+            }
+            if (state.deadline && (state.phase === 'active' || state.phase === 'frozen' || state.phase === 'break')) {
+                const updateTime = () => {
+                    const diff = Math.max(0, state.deadline - Date.now());
+                    const s = Math.ceil(diff / 1000);
+                    const min = Math.floor(s / 60).toString().padStart(2, '0');
+                    const sec = (s % 60).toString().padStart(2, '0');
+                    document.getElementById('adminTimer').textContent = `${min}:${sec}`;
+                    if (diff <= 0) clearInterval(adminInterval);
+                };
+                updateTime();
+                adminInterval = setInterval(updateTime, 1000);
+            } else {
+                document.getElementById('adminTimer').textContent = "--:--";
+            }
+        });
+    </script>
+</body>
+</html>
